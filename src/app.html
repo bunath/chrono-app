@@ -385,12 +385,22 @@ body.light .melody-sel-btn{background:#f9fafb;color:#111827;}
 /* Cercle minuteur */
 .timer-disp{
   position:relative;margin:0 auto;
-  width:min(320px,80vw);height:min(320px,80vw);flex-shrink:0;
+  width:min(300px,78vw);height:min(300px,78vw);flex-shrink:0;
 }
-.tool-wrap.fs .timer-disp{width:min(500px,70vmin);height:min(500px,70vmin);}
-.t-svg{position:absolute;inset:0;width:100%;height:100%;}
-.t-bg{fill:none;stroke:rgba(148,163,184,0.25);stroke-width:11;}
-.t-prog{fill:none;stroke:var(--success);stroke-width:11;stroke-linecap:round;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1s linear,stroke 0.25s;}
+.tool-wrap.fs .timer-disp{width:min(480px,68vmin);height:min(480px,68vmin);}
+.t-svg{
+  width:100%;height:100%;
+  overflow:visible; /* laisser le SVG gérer son espace */
+}
+.t-bg{fill:none;stroke:rgba(148,163,184,0.15);stroke-width:10;}
+.t-prog{
+  fill:none;stroke:var(--success);stroke-width:10;stroke-linecap:round;
+  /* Rotation depuis le centre exact du SVG (150,150) */
+  transform:rotate(-90deg);
+  transform-origin:150px 150px;
+  transform-box:fill-box;
+  transition:stroke-dashoffset 0.6s linear,stroke 0.3s;
+}
 .t-time{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
 .t-digits{font-size:3rem;font-weight:900;letter-spacing:0.06em;font-family:var(--display-font);}
 .tool-wrap.fs .t-digits{font-size:min(12vw,5rem);}
@@ -422,17 +432,133 @@ body.light .tz-sel{background:#f9fafb;color:#111827;}
 .clock-date{font-size:0.9rem;color:var(--soft);letter-spacing:0.05em;}
 .tool-wrap.fs .clock-date{display:block;}
 
-/* Cadran SVG */
+/* ── Cadran CSS div (Pratyush Sudhakar model) ── */
 .clock-svg-wrap{
-  position:relative;
-  width:min(270px,74vw);height:min(270px,74vw);
+  display:flex;align-items:center;justify-content:center;
   flex-shrink:0;
 }
-.tool-wrap.fs .clock-svg-wrap{width:min(460px,58vmin);height:min(460px,58vmin);}
-.clock-svg-wrap svg{width:100%;height:100%;}
+.clock-face-wrap{
+  width:min(260px,72vw);
+  height:min(260px,72vw);
+  position:relative;
+}
+.tool-wrap.fs .clock-face-wrap{width:min(440px,56vmin);height:min(440px,56vmin);}
 
-/* Aiguilles SVG animées par JS */
-#hand-h,#hand-m,#hand-s{transform-origin:center;}
+.clock-face{
+  width:100%;height:100%;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #f4f6f9 0%, #e8ecf0 100%);
+  box-shadow:
+    inset 0 2px 6px rgba(255,255,255,0.9),
+    inset 0 -3px 8px rgba(0,0,0,0.1),
+    0 6px 32px rgba(0,0,0,0.45),
+    0 0 0 2px rgba(148,163,184,0.3);
+  position:relative;overflow:hidden;
+}
+body.light .clock-face{box-shadow:inset 0 2px 6px rgba(255,255,255,0.9),inset 0 -3px 8px rgba(0,0,0,0.06),0 4px 20px rgba(0,0,0,0.18);}
+
+/* Graduations */
+.clock-tick{
+  position:absolute;
+  top:0;left:50%;
+  width:2px;height:100%;
+  transform-origin:center;
+}
+.clock-tick::before{
+  content:'';
+  position:absolute;
+  top:6%;left:50%;
+  transform:translateX(-50%);
+  border-radius:2px;
+  background:#bcc4ce;
+}
+.clock-tick.major::before{
+  width:2.5px;height:8%;
+  background:#5a6070;
+}
+.clock-tick.minor::before{
+  width:1px;height:4%;
+  background:#cdd3db;
+}
+
+/* Chiffres */
+.clock-num{
+  position:absolute;
+  top:0;left:50%;
+  width:0;height:50%;
+  transform-origin:bottom center;
+  display:flex;align-items:flex-start;justify-content:center;
+  transform:rotate(calc(var(--i) * 30deg));
+}
+.clock-num span{
+  transform:rotate(calc(var(--i) * -30deg));
+  font-family:'Poppins',sans-serif;
+  font-size:clamp(0.6rem,2.8%,0.75rem);
+  font-weight:700;
+  color:#444;
+  margin-top:6%;
+  line-height:1;
+}
+
+/* Aiguilles */
+.hand{
+  position:absolute;
+  bottom:50%;left:50%;
+  transform-origin:bottom center;
+  transform:translateX(-50%) rotate(0deg);
+  border-radius:4px 4px 2px 2px;
+  transition:transform 0.15s cubic-bezier(0.4,2.08,0.55,0.44);
+}
+.hand-h{
+  width:4.5%;height:28%;
+  background:linear-gradient(to top,#1e293b,#2d3e50);
+  margin-left:-2.25%;
+  border-radius:3px 3px 0 0;
+  box-shadow:0 2px 4px rgba(0,0,0,0.2);
+}
+.hand-m{
+  width:3%;height:38%;
+  background:linear-gradient(to top,#334155,#475a70);
+  margin-left:-1.5%;
+  border-radius:2px 2px 0 0;
+  box-shadow:0 1px 3px rgba(0,0,0,0.18);
+}
+.hand-s{
+  width:1.5%;height:44%;
+  background:#ef4444;
+  margin-left:-0.75%;
+  box-shadow:0 1px 4px rgba(239,68,68,0.4);
+  /* Contrepoids */
+  border-radius:2px;
+}
+.hand-s::after{
+  content:'';
+  position:absolute;
+  bottom:-12%;left:50%;
+  width:280%;height:12%;
+  background:#ef4444;
+  transform:translateX(-50%);
+  border-radius:2px;
+}
+
+/* Pivot central */
+.clock-pivot{
+  position:absolute;top:50%;left:50%;
+  width:5%;height:5%;
+  background:#1e293b;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  z-index:20;
+  box-shadow:0 1px 4px rgba(0,0,0,0.35);
+}
+.clock-pivot::before{
+  content:'';position:absolute;
+  inset:20%;background:#ef4444;border-radius:50%;
+}
+.clock-pivot::after{
+  content:'';position:absolute;
+  inset:40%;background:#fff;border-radius:50%;opacity:0.6;
+}
 
 /* ══ SETTINGS PANEL ══════════════════════════════════════════ */
 .settings-panel{
@@ -660,8 +786,8 @@ body.light .font-sel{background:#f0f4f8;color:#0f172a;}
 
         <div class="timer-disp hidden" id="t-disp">
           <svg class="t-svg" viewBox="0 0 300 300">
-            <circle class="t-bg"   cx="150" cy="150" r="132"></circle>
-            <circle class="t-prog" id="t-prog" cx="150" cy="150" r="132"></circle>
+            <circle class="t-bg"   cx="150" cy="150" r="120"></circle>
+            <circle class="t-prog" id="t-prog" cx="150" cy="150" r="120"></circle>
           </svg>
           <div class="t-time"><div class="t-digits"><span id="t-dh">00</span>:<span id="t-dm">00</span>:<span id="t-ds">00</span></div></div>
         </div>
@@ -686,60 +812,17 @@ body.light .font-sel{background:#f0f4f8;color:#0f172a;}
           </div>
           <div class="dig-clock" id="dig-clock">00:00:00</div>
           <div class="clock-date" id="clock-date">—</div>
-          <!-- Horloge SVG — modèle njmsaikat/clock adapté -->
+          <!-- Horloge CSS div — modèle Pratyush Sudhakar adapté -->
           <div class="clock-svg-wrap">
-            <svg id="clock-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <filter id="shadow">
-                  <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.15"/>
-                </filter>
-              </defs>
-              <!-- Fond du cadran -->
-              <circle cx="150" cy="150" r="145" fill="#f8f8f8" stroke="#ccc" stroke-width="1.5" filter="url(#shadow)"/>
-              <circle cx="150" cy="150" r="138" fill="none" stroke="rgba(0,0,0,0.04)" stroke-width="1"/>
-
-              <!-- Graduations heures (path compact) -->
-              <path class="hour-marks"
-                d="M150 12V28 M288 150H272 M150 288V272 M12 150H28
-                   M218 19.2L210 33 M272.8 82L259 90 M272.8 218L259 210
-                   M218 280.8L210 267 M82 280.8L90 267 M27.2 218L41 210
-                   M27.2 82L41 90 M82 19.2L90 33"
-                stroke="#444" stroke-width="3.5" stroke-linecap="round"/>
-
-              <!-- Graduations minutes -->
-              <path class="minute-marks"
-                d="M150 8V16 M150 8V16 M150 8V16"
-                stroke="none"/>
-
-              <!-- On dessine 60 graduations via JS — placeholder -->
-              <g id="tick-marks"></g>
-
-              <!-- Chiffres -->
-              <text x="150" y="40"  text-anchor="middle" font-family="system-ui,sans-serif" font-size="16" font-weight="700" fill="#222">12</text>
-              <text x="263" y="155" text-anchor="middle" font-family="system-ui,sans-serif" font-size="16" font-weight="700" fill="#222">3</text>
-              <text x="150" y="272" text-anchor="middle" font-family="system-ui,sans-serif" font-size="16" font-weight="700" fill="#222">6</text>
-              <text x="37"  y="155" text-anchor="middle" font-family="system-ui,sans-serif" font-size="16" font-weight="700" fill="#222">9</text>
-
-              <!-- Aiguille heures -->
-              <g id="g-hour" style="transform-origin:150px 150px">
-                <path d="M150 150 L150 75" stroke="#1e293b" stroke-width="7" stroke-linecap="round"/>
-                <circle cx="150" cy="150" r="145" fill="none"/>
-              </g>
-              <!-- Aiguille minutes -->
-              <g id="g-min" style="transform-origin:150px 150px">
-                <path d="M150 150 L150 45" stroke="#334155" stroke-width="4.5" stroke-linecap="round"/>
-                <circle cx="150" cy="150" r="145" fill="none"/>
-              </g>
-              <!-- Aiguille secondes -->
-              <g id="g-sec" style="transform-origin:150px 150px">
-                <path d="M150 175 L150 38" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
-                <circle cx="150" cy="150" r="145" fill="none"/>
-              </g>
-              <!-- Pivot central -->
-              <circle cx="150" cy="150" r="7"   fill="#1e293b"/>
-              <circle cx="150" cy="150" r="3.5" fill="#ef4444"/>
-              <circle cx="150" cy="150" r="1.5" fill="#fff"/>
-            </svg>
+            <div class="clock-face-wrap" id="the-clock">
+              <div class="clock-face">
+                <div class="hand hand-h" id="hand-h"></div>
+                <div class="hand hand-m" id="hand-m"></div>
+                <div class="hand hand-s" id="hand-s"></div>
+                <div class="clock-pivot"></div>
+                <div id="clock-ticks-wrap"></div>
+              </div>
+            </div>
           </div>        </div>
       </div>
     </section>
@@ -1153,7 +1236,7 @@ async function initTimer(){
     });
   });
 
-  const R=132,C=2*Math.PI*R;
+  const R=120,C=2*Math.PI*R;
   prog.style.strokeDasharray=C;prog.style.strokeDashoffset=C;
 
   let total=0,remain=0,running=false,ivl=null;
@@ -1323,31 +1406,31 @@ async function initTimer(){
   renderPresets();
 }
 
-// ══ HORLOGE — SVG propre ════════════════════════════════════
+// ══ HORLOGE — CSS div model ═════════════════════════════════
 function initClock(){
-  const tEl=document.getElementById('dig-clock');
-  const dEl=document.getElementById('clock-date');
-  const tzSel=document.getElementById('tz-sel');
-  const gHour=document.getElementById('g-hour');
-  const gMin=document.getElementById('g-min');
-  const gSec=document.getElementById('g-sec');
-  const tickMarks=document.getElementById('tick-marks');
+  const tEl   = document.getElementById('dig-clock');
+  const dEl   = document.getElementById('clock-date');
+  const tzSel = document.getElementById('tz-sel');
+  const handH = document.getElementById('hand-h');
+  const handM = document.getElementById('hand-m');
+  const handS = document.getElementById('hand-s');
+  const ticksWrap = document.getElementById('clock-ticks-wrap');
+  const face  = document.querySelector('.clock-face');
 
-  // Dessiner les 60 graduations minutes
+  // Générer 60 graduations et 12 chiffres par JS
   for(let i=0;i<60;i++){
-    if(i%5===0) continue; // déjà dessinées par les heures
-    const angle=i*6;
-    const rad=angle*Math.PI/180;
-    const cx=150,cy=150,r1=138,r2=130;
-    const x1=cx+r1*Math.sin(rad), y1=cy-r1*Math.cos(rad);
-    const x2=cx+r2*Math.sin(rad), y2=cy-r2*Math.cos(rad);
-    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
-    line.setAttribute('x1',x1.toFixed(1)); line.setAttribute('y1',y1.toFixed(1));
-    line.setAttribute('x2',x2.toFixed(1)); line.setAttribute('y2',y2.toFixed(1));
-    line.setAttribute('stroke','#ccc'); line.setAttribute('stroke-width','1.2');
-    line.setAttribute('stroke-linecap','round');
-    tickMarks.appendChild(line);
+    const tick=document.createElement('div');
+    tick.className='clock-tick '+(i%5===0?'major':'minor');
+    tick.style.transform=`rotate(${i*6}deg)`;
+    ticksWrap.appendChild(tick);
   }
+  [1,2,3,4,5,6,7,8,9,10,11,12].forEach(n=>{
+    const el=document.createElement('div');
+    el.className='clock-num';
+    el.style.setProperty('--i',n);
+    el.innerHTML=`<span>${n}</span>`;
+    face.appendChild(el);
+  });
 
   const TZ=[
     {l:'Heure locale',v:'local'},{l:'UTC',v:'UTC'},{l:'Paris',v:'Europe/Paris'},
@@ -1362,8 +1445,7 @@ function initClock(){
   ];
   TZ.forEach(t=>{
     const o=document.createElement('option');
-    o.value=t.v; o.textContent=t.l;
-    tzSel.appendChild(o);
+    o.value=t.v;o.textContent=t.l;tzSel.appendChild(o);
   });
   tzSel.value=load('cl-tz','local');
   tzSel.addEventListener('change',()=>save('cl-tz',tzSel.value));
@@ -1384,26 +1466,24 @@ function initClock(){
     }catch{return new Date();}
   }
 
-  function rotate(el, deg){
-    el.style.transform = `rotate(${deg}deg)`;
+  function setRotate(el, deg){
+    el.style.transform=`translateX(-50%) rotate(${deg}deg)`;
   }
 
   function tick(){
     const now=getTime(tzSel.value);
-    const h=now.getHours(), m=now.getMinutes(), s=now.getSeconds();
+    const h=now.getHours(),m=now.getMinutes(),s=now.getSeconds();
 
-    // Numérique
     tEl.textContent=[h,m,s].map(v=>v.toString().padStart(2,'0')).join(':');
     dEl.textContent=`${DAYS[now.getDay()]} ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
 
-    // Angles aiguilles
-    rotate(gHour, (h%12)*30 + m*0.5 + s*(0.5/60));
-    rotate(gMin,  m*6 + s*0.1);
-    rotate(gSec,  s*6);
+    setRotate(handH, (h%12)*30 + m*0.5 + s*(0.5/60));
+    setRotate(handM, m*6 + s*0.1);
+    setRotate(handS, s*6);
   }
 
   tick();
-  setInterval(tick, 1000);
+  setInterval(tick,1000);
 }
 
 // ══ DOUBLE ÉCRAN ═════════════════════════════════════════════
