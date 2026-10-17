@@ -1,0 +1,1798 @@
+<!doctype html>
+<html lang="fr" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chrono Multi‑Outils</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --color-primary: #2563eb;
+      --color-secondary: #7c3aed;
+      --color-accent: #f97316;
+      --color-success: #10B981;
+      --color-warning: #F59E0B;
+      --color-danger:  #EF4444;
+
+      --glass-bg: rgba(15, 23, 42, 0.9);
+      --glass-border: rgba(51, 65, 85, 0.9);
+      --background: radial-gradient(circle at top, #020617 0, #020617 55%, #000 100%);
+      --text-color: #e5e7eb;
+      --soft-text: #9ca3af;
+    }
+
+    body.light-theme {
+      --background: radial-gradient(circle at top, #e5f0ff 0, #f9fafb 55%, #e5e7eb 100%);
+      --glass-bg: rgba(255, 255, 255, 0.98);
+      --glass-border: rgba(148, 163, 184, 1);
+      --text-color: #020617;
+      --soft-text: #4b5563;
+    }
+
+    body.dark-theme {
+      --background: radial-gradient(circle at top, #020617 0, #020617 55%, #000 100%);
+      --glass-bg: rgba(15, 23, 42, 0.92);
+      --glass-border: rgba(51, 65, 85, 0.9);
+      --text-color: #e5e7eb;
+      --soft-text: #9ca3af;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--background);
+      color: var(--text-color);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .app-container {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Particules */
+    .floating-particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 50%;
+      animation: floatParticle 18s infinite linear;
+      opacity: 0.6;
+    }
+
+    @keyframes floatParticle {
+      0%   { transform: translateY(100vh) translateX(0);   opacity: 0; }
+      10%  { opacity: 0.7; }
+      90%  { opacity: 0.7; }
+      100% { transform: translateY(-10vh) translateX(40px); opacity: 0; }
+    }
+
+    /* Header */
+    .header {
+      padding: 1.6rem 2.4rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(24px) saturate(180%);
+      border-bottom: 1px solid var(--glass-border);
+      position: relative;
+      z-index: 100;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+      gap: 2rem;
+    }
+
+    body.light-theme .header {
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 8px 24px rgba(148, 163, 184, 0.5);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 2.1rem;
+      font-weight: 900;
+      letter-spacing: -0.06em;
+    }
+
+    .logo i {
+      font-size: 2.6rem;
+      color: var(--color-accent);
+      filter: drop-shadow(0 0 10px rgba(248, 250, 252, 0.6));
+      animation: logoGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes logoGlow {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-2px); }
+    }
+
+    .settings-btn {
+      background: transparent;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      color: var(--soft-text);
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      right: 2rem;
+    }
+
+    .settings-btn:hover {
+      background: rgba(37, 99, 235, 0.12);
+      color: var(--color-primary);
+      transform: translateY(-1px);
+    }
+
+    /* Main */
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2.2rem;
+    }
+
+    .page {
+      display: none;
+      animation: fadeIn 0.35s ease;
+    }
+    .page.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px) scale(0.99); }
+      to   { opacity: 1; transform: translateY(0)    scale(1); }
+    }
+
+    /* Accueil */
+    .home-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .home-hero {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .home-hero h1 {
+      font-size: 3.2rem;
+      font-weight: 900;
+      margin-bottom: 1rem;
+      letter-spacing: -0.06em;
+    }
+
+    .home-hero p {
+      font-size: 1.25rem;
+      opacity: 0.9;
+      margin-bottom: 2rem;
+      color: var(--soft-text);
+    }
+
+    .hero-button {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      color: #f9fafb;
+      border: none;
+      padding: 0.9rem 2.3rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.26s ease;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.7);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .hero-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 22px 48px rgba(15, 23, 42, 0.85);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.8rem;
+      margin-top: 2.5rem;
+    }
+
+    .feature-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(22px) saturate(180%);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      border-radius: 22px;
+      padding: 1.8rem;
+      cursor: pointer;
+      transition: all 0.22s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body.light-theme .feature-card {
+      background: #ffffff;
+      border-color: rgba(148, 163, 184, 0.7);
+      box-shadow: 0 10px 30px rgba(148, 163, 184, 0.35);
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(59, 130, 246, 0.25), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(96, 165, 250, 0.9);
+    }
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon {
+      font-size: 2.4rem;
+      margin-bottom: 1rem;
+      color: var(--color-accent);
+    }
+
+    .feature-card h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .feature-card p {
+      font-size: 0.95rem;
+      opacity: 0.9;
+      margin-bottom: 1.1rem;
+      color: var(--soft-text);
+    }
+
+    .feature-button {
+      background: rgba(37, 99, 235, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.7);
+      color: var(--color-primary);
+      padding: 0.55rem 1.2rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .feature-button:hover {
+      background: rgba(37, 99, 235, 0.16);
+      transform: translateX(3px);
+    }
+
+    /* Bloc outil */
+    .tool-container {
+      max-width: 700px;
+      margin: 0 auto;
+      background: var(--glass-bg);
+      backdrop-filter: blur(26px) saturate(190%);
+      border: 1px solid var(--glass-border);
+      border-radius: 30px;
+      padding: 2.6rem 2.3rem;
+      box-shadow: 0 22px 60px rgba(0, 0, 0, 0.6);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body.light-theme .tool-container {
+      background: #ffffff;
+      box-shadow: 0 18px 48px rgba(148, 163, 184, 0.5);
+    }
+
+    .tool-title {
+      font-size: 2rem;
+      font-weight: 900;
+      text-align: center;
+      margin-top: 0.4rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .fullscreen-btn {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      color: #e5e7eb;
+      padding: 0.55rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 1.05rem;
+      transition: all 0.2s ease;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 1.1rem;
+      right: 1.4rem;
+      z-index: 10;
+    }
+
+    body.light-theme .fullscreen-btn {
+      background: #111827;
+      color: #f9fafb;
+      border-color: #111827;
+    }
+
+    .fullscreen-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.7);
+    }
+
+    /* Plein écran */
+    .tool-container.fullscreen {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 0;
+      margin: 0;
+      padding: 3rem 1.8rem 2.2rem;
+      z-index: 9999;
+      background: var(--background);
+      border: none;
+      box-shadow: none;
+    }
+
+    .tool-container.fullscreen .tool-title {
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+
+    /* Bouton discret pour afficher / cacher les contrôles en plein écran */
+    .fs-controls-toggle {
+      position: absolute;
+      bottom: 1.6rem;
+      right: 1.6rem;
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      padding: 0.45rem 0.85rem;
+      display: none;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      z-index: 20;
+    }
+
+    body.light-theme .fs-controls-toggle {
+      background: #111827;
+      color: #f9fafb;
+      border-color: #111827;
+    }
+
+    .tool-container.fullscreen .fs-controls-toggle {
+      display: inline-flex;
+    }
+
+    .fs-controls-toggle i {
+      font-size: 0.8rem;
+    }
+
+    /* Chronomètre */
+    .stopwatch-display {
+      text-align: center;
+      margin: 2.6rem 0 1.8rem;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stopwatch-time {
+      font-size: 5.5rem;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      display: flex;
+      justify-content: center;
+      align-items: baseline;
+      gap: 0.25rem;
+    }
+
+    .tool-container.fullscreen .stopwatch-time {
+      font-size: 8.5rem;
+    }
+
+    .stopwatch-centiseconds-container {
+      display: inline-block;
+      transition: opacity 0.2s ease;
+    }
+    .stopwatch-centiseconds-container.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .stopwatch-centiseconds {
+      font-size: 2.3rem;
+      opacity: 0.8;
+    }
+
+    .stopwatch-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.8rem;
+      margin-top: 0.8rem;
+    }
+
+    /* masqués par défaut en plein écran, affichables via bouton */
+    .tool-container.fullscreen .stopwatch-controls {
+      display: none;
+    }
+    .tool-container.fullscreen.show-controls .stopwatch-controls {
+      display: flex;
+      margin-bottom: 1.5rem;
+    }
+
+    .control-btn {
+      padding: 1.1rem 2.6rem;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      width: 100%;
+      max-width: 320px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .control-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-start {
+      background: linear-gradient(135deg, var(--color-success), #059669);
+      color: #ecfdf5;
+    }
+    .btn-start:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 40px rgba(16, 185, 129, 0.6);
+    }
+
+    .btn-pause {
+      background: linear-gradient(135deg, var(--color-warning), #D97706);
+      color: #fffbeb;
+    }
+    .btn-pause:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 40px rgba(245, 158, 11, 0.6);
+    }
+
+    .btn-reset {
+      background: linear-gradient(135deg, var(--color-danger), #DC2626);
+      color: #fef2f2;
+    }
+    .btn-reset:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 40px rgba(239, 68, 68, 0.6);
+    }
+
+    .hidden { display: none !important; }
+
+    /* Minuteur */
+    .timer-setup {
+      margin: 1.8rem 0;
+    }
+    .timer-setup.hidden { display: none; }
+
+    .timer-inputs {
+      display: flex;
+      justify-content: center;
+      gap: 1.1rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .timer-input-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      opacity: 0.9;
+      letter-spacing: 0.06em;
+      color: var(--soft-text);
+    }
+
+    .timer-input-group select {
+      width: 88px;
+      height: 72px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-align: center;
+      background: rgba(15, 23, 42, 0.98);
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      color: #e5e7eb;
+      border-radius: 16px;
+      appearance: none;
+      padding: 0 0.4rem;
+    }
+
+    body.light-theme .timer-input-group select {
+      background: #f9fafb;
+      border-color: rgba(148, 163, 184, 1);
+      color: #111827;
+    }
+
+    .melody-selector { margin-bottom: 1.8rem; }
+
+    .melody-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+      color: var(--soft-text);
+    }
+
+    .melody-dropdown {
+      position: relative;
+      width: 100%;
+    }
+
+    .melody-selected {
+      padding: 0.9rem 1.3rem;
+      background: rgba(15, 23, 42, 0.98);
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      color: #e5e7eb;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+      width: 100%;
+    }
+
+    body.light-theme .melody-selected {
+      background: #f9fafb;
+      color: #111827;
+    }
+
+    .melody-selected-content {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .melody-selected i.fa-chevron-down {
+      transition: transform 0.2s ease;
+    }
+    .melody-dropdown.open .melody-selected i.fa-chevron-down {
+      transform: rotate(180deg);
+    }
+
+    .melody-options {
+      position: absolute;
+      top: calc(100% + 0.4rem);
+      left: 0;
+      right: 0;
+      background: rgba(15, 23, 42, 0.98);
+      border-radius: 14px;
+      padding: 0.35rem;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: all 0.22s ease;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+      z-index: 50;
+    }
+    .melody-dropdown.open .melody-options {
+      max-height: 230px;
+      opacity: 1;
+      overflow-y: auto;
+    }
+
+    body.light-theme .melody-options {
+      background: #0b1120;
+      color: #e5e7eb;
+    }
+
+    .melody-btn {
+      padding: 0.7rem 0.9rem;
+      background: transparent;
+      border: none;
+      color: inherit;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+      width: 100%;
+      text-align: left;
+    }
+
+    .melody-btn-content {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex: 1;
+      font-size: 0.9rem;
+    }
+
+    .melody-btn:hover {
+      background: rgba(37, 99, 235, 0.2);
+    }
+
+    .melody-btn.active {
+      background: rgba(37, 99, 235, 0.35);
+    }
+
+    .melody-preview-btn {
+      background: rgba(37, 99, 235, 0.2);
+      border: none;
+      color: #bfdbfe;
+      padding: 0.3rem;
+      border-radius: 999px;
+      cursor: pointer;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+    }
+
+    .timer-display {
+      position: relative;
+      margin: 2.1rem auto 1.4rem;
+      width: 360px;
+      height: 360px;
+      flex-shrink: 0;
+    }
+
+    .tool-container.fullscreen .timer-display {
+      width: 580px;
+      height: 580px;
+    }
+
+    .timer-display.hidden { display: none; }
+
+    .timer-circle {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .timer-circle-bg {
+      fill: none;
+      stroke: rgba(148, 163, 184, 0.35);
+      stroke-width: 12;
+    }
+
+    .timer-circle-progress {
+      fill: none;
+      stroke: var(--color-success);
+      stroke-width: 12;
+      stroke-linecap: round;
+      transform: rotate(-90deg);
+      transform-origin: center;
+      transition: stroke-dashoffset 1s linear, stroke 0.25s ease;
+    }
+
+    .timer-time {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .timer-digits {
+      font-size: 3.4rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+    }
+
+    .tool-container.fullscreen .timer-digits {
+      font-size: 4.4rem;
+    }
+
+    /* cacher contrôles minuteur en plein écran, mais réaffichables */
+    .tool-container.fullscreen .timer-setup,
+    .tool-container.fullscreen .stopwatch-controls {
+      display: none;
+    }
+    .tool-container.fullscreen.show-controls .timer-setup,
+    .tool-container.fullscreen.show-controls .stopwatch-controls {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .timer-complete-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.95);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9998;
+    }
+    .timer-complete-overlay.active { display: flex; }
+
+    .timer-complete-content {
+      text-align: center;
+    }
+
+    .timer-complete-icon {
+      font-size: 3.6rem;
+      color: var(--color-danger);
+      margin-bottom: 1.2rem;
+    }
+
+    .timer-complete-text {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 1.3rem;
+    }
+
+    .timer-complete-close {
+      padding: 0.9rem 2.2rem;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, var(--color-danger), #b91c1c);
+      color: #fef2f2;
+      cursor: pointer;
+    }
+
+    /* Horloge */
+    .clock-container {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .digital-clock {
+      text-align: center;
+      font-size: 3.8rem;
+      font-weight: 900;
+      margin-bottom: 2rem;
+      letter-spacing: 0.06em;
+    }
+
+    .analog-clock {
+      position: relative;
+      width: 310px;
+      height: 310px;
+      margin: 0 auto;
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 1));
+      border: 7px solid rgba(148, 163, 184, 0.85);
+      border-radius: 50%;
+    }
+
+    body.light-theme .analog-clock {
+      background: radial-gradient(circle at top, #e5e7eb, #d1d5db);
+      border-color: #9ca3af;
+    }
+
+    .clock-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 16px;
+      height: 16px;
+      background: #e5e7eb;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+    }
+
+    .clock-hand {
+      position: absolute;
+      bottom: 50%;
+      left: 50%;
+      transform-origin: bottom center;
+      background: #e5e7eb;
+      border-radius: 10px 10px 0 0;
+    }
+
+    .hour-hand   { width: 8px; height: 78px; }
+    .minute-hand { width: 5px; height: 105px; }
+    .second-hand {
+      width: 3px; height: 125px;
+      background: var(--color-danger);
+    }
+
+    .clock-tick {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 2px;
+      height: 11px;
+      background: rgba(148, 163, 184, 0.85);
+      transform-origin: bottom center;
+    }
+    .clock-tick-major {
+      height: 19px;
+      background: #e5e7eb;
+    }
+
+    /* Navigation bas */
+    .bottom-nav {
+      background: rgba(15, 23, 42, 0.98);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-top: 1px solid rgba(31, 41, 55, 0.85);
+      padding: 0.7rem 1rem;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    body.light-theme .bottom-nav {
+      background: #ffffff;
+      border-top-color: rgba(148, 163, 184, 0.8);
+      box-shadow: 0 -8px 20px rgba(148, 163, 184, 0.35);
+    }
+
+    .nav-item {
+      flex: 1;
+      background: none;
+      border: none;
+      color: rgba(156, 163, 175, 0.95);
+      padding: 0.45rem;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .nav-item:hover {
+      color: #e5e7eb;
+      background: rgba(37, 99, 235, 0.25);
+    }
+
+    body.light-theme .nav-item:hover {
+      color: #111827;
+      background: rgba(37, 99, 235, 0.12);
+    }
+
+    .nav-item.active {
+      color: #e5e7eb;
+      background: rgba(37, 99, 235, 0.45);
+    }
+
+    body.light-theme .nav-item.active {
+      color: #111827;
+      background: rgba(37, 99, 235, 0.25);
+    }
+
+    .nav-item i { font-size: 1.2rem; }
+
+    /* Settings panel */
+    .settings-panel {
+      position: fixed;
+      top: 0;
+      right: -360px;
+      width: 360px;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.98);
+      backdrop-filter: blur(24px) saturate(180%);
+      border-left: 1px solid rgba(55, 65, 81, 0.9);
+      box-shadow: -14px 0 40px rgba(0, 0, 0, 0.7);
+      transition: right 0.3s ease;
+      z-index: 10000;
+      padding: 1.7rem 1.5rem;
+      color: #e5e7eb;
+    }
+    .settings-panel.open { right: 0; }
+
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .settings-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+    }
+
+    .settings-close {
+      background: rgba(31, 41, 55, 0.9);
+      border: 1px solid rgba(75, 85, 99, 0.8);
+      color: #e5e7eb;
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .settings-section {
+      margin-bottom: 1.8rem;
+    }
+
+    .settings-section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .settings-theme-buttons {
+      display: flex;
+      gap: 0.7rem;
+    }
+
+    .settings-theme-btn {
+      flex: 1;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      padding: 0.55rem 0.7rem;
+      background: rgba(15, 23, 42, 0.95);
+      color: #e5e7eb;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+
+    .settings-theme-btn:hover {
+      background: rgba(37, 99, 235, 0.25);
+    }
+
+    .settings-theme-btn.active {
+      background: rgba(37, 99, 235, 0.4);
+      border-color: rgba(59, 130, 246, 0.9);
+    }
+
+    @media (max-width: 768px) {
+      .header { padding: 1.3rem 1.4rem; }
+      .logo { font-size: 1.6rem; }
+      .main-content { padding: 1.5rem 1.1rem; }
+      .tool-container {
+        padding: 2.1rem 1.7rem;
+        border-radius: 22px;
+      }
+      .analog-clock {
+        width: 260px;
+        height: 260px;
+      }
+      .timer-display {
+        width: 280px;
+        height: 280px;
+      }
+      .tool-container.fullscreen .timer-display {
+        width: 340px;
+        height: 340px;
+      }
+      .digital-clock { font-size: 3rem; }
+      .settings-panel {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body class="h-full dark-theme">
+  <div class="floating-particles" id="particles"></div>
+
+  <div class="app-container">
+    <header class="header">
+      <div class="logo">
+        <i class="fas fa-clock"></i>
+        <span id="app-title">Chrono</span>
+      </div>
+      <button class="settings-btn" id="settings-btn">
+        <i class="fas fa-palette"></i>
+      </button>
+    </header>
+
+    <main class="main-content">
+      <!-- Accueil -->
+      <section id="home" class="page active">
+        <div class="home-content">
+          <div class="home-hero">
+            <h1>Bienvenue sur Chrono</h1>
+            <p id="home-subtitle">Chronomètre, minuteur et horloge avec thèmes et sons personnalisés.</p>
+            <button class="hero-button" id="home-start-btn">
+              <i class="fas fa-rocket"></i> Commencer
+            </button>
+          </div>
+
+          <div class="features-grid">
+            <article class="feature-card" id="home-stopwatch-card">
+              <i class="fas fa-stopwatch feature-icon"></i>
+              <h3>Chronomètre</h3>
+              <p>Mesure précise avec centièmes visibles seulement à la pause.</p>
+              <button class="feature-button" id="home-stopwatch-btn">
+                Démarrer <i class="fas fa-arrow-right"></i>
+              </button>
+            </article>
+
+            <article class="feature-card" id="home-timer-card">
+              <i class="fas fa-hourglass-half feature-icon"></i>
+              <h3>Minuteur</h3>
+              <p>Cercle large, changement en rouge à 10 % et mélodies variées.</p>
+              <button class="feature-button" id="home-timer-btn">
+                Configurer <i class="fas fa-arrow-right"></i>
+              </button>
+            </article>
+
+            <article class="feature-card" id="home-clock-card">
+              <i class="fas fa-clock feature-icon"></i>
+              <h3>Horloge</h3>
+              <p>Affichage numérique et analogique harmonisé avec le thème.</p>
+              <button class="feature-button" id="home-clock-btn">
+                Voir <i class="fas fa-arrow-right"></i>
+              </button>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Chronomètre -->
+      <section id="stopwatch" class="page">
+        <div class="tool-container" id="stopwatch-container">
+          <button class="fullscreen-btn" data-fullscreen-target="stopwatch-container">
+            <i class="fas fa-expand"></i>
+          </button>
+          <button class="fs-controls-toggle" data-target="stopwatch-container">
+            <i class="fas fa-sliders-h"></i> Contrôles
+          </button>
+          <h2 class="tool-title" id="stopwatch-title">Chronomètre</h2>
+
+          <div class="stopwatch-display">
+            <div class="stopwatch-time">
+              <span id="stopwatch-minutes">00</span>:
+              <span id="stopwatch-seconds">00</span>
+              <span class="stopwatch-centiseconds-container hidden" id="stopwatch-centiseconds-container">
+                .<span id="stopwatch-centiseconds" class="stopwatch-centiseconds">00</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="stopwatch-controls">
+            <button class="control-btn btn-start" id="stopwatch-start">
+              <i class="fas fa-play"></i><span>Démarrer</span>
+            </button>
+            <button class="control-btn btn-pause" id="stopwatch-pause" disabled>
+              <i class="fas fa-pause"></i><span>Pause</span>
+            </button>
+            <button class="control-btn btn-reset" id="stopwatch-reset" disabled>
+              <i class="fas fa-redo"></i><span>Réinitialiser</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Minuteur -->
+      <section id="timer" class="page">
+        <div class="tool-container" id="timer-container">
+          <button class="fullscreen-btn" data-fullscreen-target="timer-container">
+            <i class="fas fa-expand"></i>
+          </button>
+          <button class="fs-controls-toggle" data-target="timer-container">
+            <i class="fas fa-sliders-h"></i> Contrôles
+          </button>
+          <h2 class="tool-title" id="timer-title">Minuteur</h2>
+
+          <div class="timer-setup" id="timer-setup">
+            <div class="timer-inputs">
+              <div class="timer-input-group">
+                <label for="timer-hour-select">Heures</label>
+                <select id="timer-hour-select"></select>
+              </div>
+              <div class="timer-input-group">
+                <label for="timer-min-select">Minutes</label>
+                <select id="timer-min-select"></select>
+              </div>
+              <div class="timer-input-group">
+                <label for="timer-sec-select">Secondes</label>
+                <select id="timer-sec-select"></select>
+              </div>
+            </div>
+
+            <div class="melody-selector">
+              <p class="melody-title">Mélodie de fin</p>
+              <div class="melody-dropdown" id="melody-dropdown">
+                <button class="melody-selected" id="melody-selected">
+                  <span class="melody-selected-content">
+                    <i class="fas fa-volume-up"></i>
+                    <span id="melody-selected-text">Bip simple</span>
+                  </span>
+                  <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="melody-options" id="melody-options"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timer-display hidden" id="timer-display">
+            <svg class="timer-circle" viewBox="0 0 300 300">
+              <circle class="timer-circle-bg" cx="150" cy="150" r="135"></circle>
+              <circle class="timer-circle-progress" cx="150" cy="150" r="135"></circle>
+            </svg>
+            <div class="timer-time">
+              <div class="timer-digits">
+                <span id="timer-hours">00</span>:
+                <span id="timer-minutes">00</span>:
+                <span id="timer-seconds">00</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="stopwatch-controls">
+            <button class="control-btn btn-start" id="timer-start">
+              <i class="fas fa-play"></i>Démarrer
+            </button>
+            <button class="control-btn btn-pause hidden" id="timer-pause">
+              <i class="fas fa-pause"></i>Pause
+            </button>
+            <button class="control-btn btn-reset hidden" id="timer-reset">
+              <i class="fas fa-redo"></i>Réinitialiser
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Horloge -->
+      <section id="clock" class="page">
+        <div class="tool-container" id="clock-container">
+          <button class="fullscreen-btn" data-fullscreen-target="clock-container">
+            <i class="fas fa-expand"></i>
+          </button>
+          <h2 class="tool-title" id="clock-title">Horloge</h2>
+
+          <div class="clock-container">
+            <div class="digital-clock" id="clock-time">00:00:00</div>
+            <div class="analog-clock">
+              <div class="clock-center"></div>
+              <div class="clock-hand hour-hand" id="hour-hand"></div>
+              <div class="clock-hand minute-hand" id="minute-hand"></div>
+              <div class="clock-hand second-hand" id="second-hand"></div>
+              <div id="clock-ticks"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-page="home">
+        <i class="fas fa-home"></i><span>Accueil</span>
+      </button>
+      <button class="nav-item" data-page="stopwatch">
+        <i class="fas fa-stopwatch"></i><span>Chrono</span>
+      </button>
+      <button class="nav-item" data-page="timer">
+        <i class="fas fa-hourglass-half"></i><span>Minuteur</span>
+      </button>
+      <button class="nav-item" data-page="clock">
+        <i class="fas fa-clock"></i><span>Horloge</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Overlay fin minuteur -->
+  <div class="timer-complete-overlay" id="timer-complete">
+    <div class="timer-complete-content">
+      <div class="timer-complete-icon">
+        <i class="fas fa-bell"></i>
+      </div>
+      <div class="timer-complete-text">Temps écoulé !</div>
+      <button class="timer-complete-close" id="timer-complete-close">Fermer</button>
+    </div>
+  </div>
+
+  <!-- Panneau paramètres -->
+  <aside class="settings-panel" id="settings-panel">
+    <div class="settings-header">
+      <h2 class="settings-title">Paramètres</h2>
+      <button class="settings-close" id="settings-close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <section class="settings-section">
+      <h3 class="settings-section-title">
+        <i class="fas fa-moon"></i> Thème
+      </h3>
+      <div class="settings-theme-buttons">
+        <button type="button" class="settings-theme-btn" data-theme="light">
+          <i class="fas fa-sun"></i> Clair
+        </button>
+        <button type="button" class="settings-theme-btn" data-theme="dark">
+          <i class="fas fa-moon"></i> Sombre
+        </button>
+      </div>
+    </section>
+  </aside>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initParticles();
+      initSettingsPanel();
+      initFullscreenButtons();
+      initFsControlsToggle();
+      initNavigation();
+      initStopwatch();
+      initTimer();
+      initClock();
+    });
+
+    function initParticles() {
+      const container = document.getElementById('particles');
+      if (!container) return;
+      const COUNT = 25;
+      for (let i = 0; i < COUNT; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.animationDelay = Math.random() * 15 + 's';
+        p.style.animationDuration = 15 + Math.random() * 10 + 's';
+        container.appendChild(p);
+      }
+    }
+
+    function applyTheme(theme) {
+      document.body.classList.remove('light-theme', 'dark-theme');
+      document.body.classList.add(theme === 'light' ? 'light-theme' : 'dark-theme');
+    }
+
+    function initSettingsPanel() {
+      const btn = document.getElementById('settings-btn');
+      const panel = document.getElementById('settings-panel');
+      const closeBtn = document.getElementById('settings-close');
+      const themeBtns = document.querySelectorAll('.settings-theme-btn');
+
+      if (!btn || !panel || !closeBtn) return;
+
+      btn.addEventListener('click', () => panel.classList.add('open'));
+      closeBtn.addEventListener('click', () => panel.classList.remove('open'));
+
+      const savedTheme = localStorage.getItem('chrono-theme') || 'dark';
+      applyTheme(savedTheme);
+      themeBtns.forEach(b => {
+        b.classList.toggle('active', b.dataset.theme === savedTheme);
+        b.addEventListener('click', () => {
+          const t = b.dataset.theme;
+          applyTheme(t);
+          localStorage.setItem('chrono-theme', t);
+          themeBtns.forEach(x => x.classList.toggle('active', x.dataset.theme === t));
+        });
+      });
+    }
+
+    function initFullscreenButtons() {
+      document.querySelectorAll('.fullscreen-btn').forEach(btn => {
+        const targetId = btn.dataset.fullscreenTarget;
+        const container = document.getElementById(targetId);
+        if (!container) return;
+        btn.addEventListener('click', () => {
+          container.classList.toggle('fullscreen');
+          container.classList.remove('show-controls');
+          const icon = btn.querySelector('i');
+          icon.className = container.classList.contains('fullscreen')
+            ? 'fas fa-compress'
+            : 'fas fa-expand';
+        });
+      });
+    }
+
+    function initFsControlsToggle() {
+      document.querySelectorAll('.fs-controls-toggle').forEach(btn => {
+        const targetId = btn.dataset.target;
+        const container = document.getElementById(targetId);
+        if (!container) return;
+        btn.addEventListener('click', () => {
+          if (!container.classList.contains('fullscreen')) return;
+          container.classList.toggle('show-controls');
+        });
+      });
+    }
+
+    function initNavigation() {
+      const pages = document.querySelectorAll('.page');
+      const navButtons = document.querySelectorAll('.nav-item');
+
+      function showPage(name) {
+        pages.forEach(p => p.classList.toggle('active', p.id === name));
+        navButtons.forEach(b => b.classList.toggle('active', b.dataset.page === name));
+      }
+
+      navButtons.forEach(btn => {
+        btn.addEventListener('click', () => showPage(btn.dataset.page));
+      });
+
+      const map = {
+        'home-start-btn': 'stopwatch',
+        'home-stopwatch-card': 'stopwatch',
+        'home-timer-card': 'timer',
+        'home-clock-card': 'clock',
+        'home-stopwatch-btn': 'stopwatch',
+        'home-timer-btn': 'timer',
+        'home-clock-btn': 'clock'
+      };
+
+      Object.entries(map).forEach(([id, page]) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('click', e => {
+          e.stopPropagation();
+          showPage(page);
+        });
+      });
+    }
+
+    function initStopwatch() {
+      let running = false;
+      let timeMs = 0;
+      let lastTime = 0;
+
+      const minutesEl = document.getElementById('stopwatch-minutes');
+      const secondsEl = document.getElementById('stopwatch-seconds');
+      const centiEl = document.getElementById('stopwatch-centiseconds');
+      const centiContainer = document.getElementById('stopwatch-centiseconds-container');
+      const startBtn = document.getElementById('stopwatch-start');
+      const pauseBtn = document.getElementById('stopwatch-pause');
+      const resetBtn = document.getElementById('stopwatch-reset');
+
+      if (!minutesEl || !secondsEl || !centiEl || !startBtn || !pauseBtn || !resetBtn) return;
+
+      function render(showCenti) {
+        const totalSeconds = Math.floor(timeMs / 1000);
+        const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+        const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+        const centiseconds = Math.floor((timeMs % 1000) / 10).toString().padStart(2, '0');
+        minutesEl.textContent = minutes;
+        secondsEl.textContent = seconds;
+        if (showCenti) {
+          centiContainer.classList.remove('hidden');
+          centiEl.textContent = centiseconds;
+        } else {
+          centiContainer.classList.add('hidden');
+        }
+      }
+
+      function loop(now) {
+        if (!running) return;
+        const delta = now - lastTime;
+        if (delta >= 10) {
+          timeMs += delta;
+          render(false);
+          lastTime = now;
+        }
+        requestAnimationFrame(loop);
+      }
+
+      startBtn.addEventListener('click', () => {
+        if (running) return;
+        running = true;
+        startBtn.disabled = true;
+        pauseBtn.disabled = false;
+        resetBtn.disabled = false;
+        lastTime = performance.now();
+        requestAnimationFrame(loop);
+      });
+
+      pauseBtn.addEventListener('click', () => {
+        if (!running) return;
+        running = false;
+        startBtn.disabled = false;
+        pauseBtn.disabled = true;
+        render(true);
+      });
+
+      resetBtn.addEventListener('click', () => {
+        running = false;
+        timeMs = 0;
+        render(false);
+        startBtn.disabled = false;
+        pauseBtn.disabled = true;
+        resetBtn.disabled = true;
+      });
+
+      render(false);
+    }
+
+    function initTimer() {
+      const hourSelect = document.getElementById('timer-hour-select');
+      const minSelect = document.getElementById('timer-min-select');
+      const secSelect = document.getElementById('timer-sec-select');
+
+      const setup = document.getElementById('timer-setup');
+      const display = document.getElementById('timer-display');
+      const startBtn = document.getElementById('timer-start');
+      const pauseBtn = document.getElementById('timer-pause');
+      const resetBtn = document.getElementById('timer-reset');
+
+      const hEl = document.getElementById('timer-hours');
+      const mEl = document.getElementById('timer-minutes');
+      const sEl = document.getElementById('timer-seconds');
+
+      const progressCircle = document.querySelector('.timer-circle-progress');
+      const overlay = document.getElementById('timer-complete');
+      const overlayClose = document.getElementById('timer-complete-close');
+
+      const dropdown = document.getElementById('melody-dropdown');
+      const selectedBtn = document.getElementById('melody-selected');
+      const selectedText = document.getElementById('melody-selected-text');
+      const optionsContainer = document.getElementById('melody-options');
+
+      if (!hourSelect || !minSelect || !secSelect || !setup || !display || !startBtn || !pauseBtn || !resetBtn ||
+          !hEl || !mEl || !sEl || !progressCircle || !overlay || !overlayClose ||
+          !dropdown || !selectedBtn || !selectedText || !optionsContainer) return;
+
+      function fillSelect(select, min, max, step = 1) {
+        select.innerHTML = '';
+        for (let v = min; v <= max; v += step) {
+          const opt = document.createElement('option');
+          opt.value = v;
+          opt.textContent = v.toString().padStart(2, '0');
+          select.appendChild(opt);
+        }
+      }
+
+      fillSelect(hourSelect, 0, 23, 1);
+      fillSelect(minSelect, 0, 59, 1);
+      fillSelect(secSelect, 0, 59, 1);
+      minSelect.value = '5';
+
+      const melodies = [
+        { id: 'simple',   label: 'Bip simple' },
+        { id: 'fast',     label: 'Bip rapide' },
+        { id: 'beep3',    label: '3 bips courts' },
+        { id: 'pulseUp',  label: 'Montée' },
+        { id: 'alarm',    label: 'Alarme longue' },
+        { id: 'arpeggio', label: 'Arpège doux' },
+        { id: 'nature',   label: 'Nature / carillon' },
+        { id: 'victory',  label: 'Victoire' },
+        { id: 'space',    label: 'Space synth' }
+      ];
+      let selectedMelody = 'simple';
+
+      let totalMs = 0;
+      let remainingMs = 0;
+      let running = false;
+      let intervalId = null;
+
+      const radius = 135;
+      const circumference = 2 * Math.PI * radius;
+      progressCircle.style.strokeDasharray = `${circumference}`;
+      progressCircle.style.strokeDashoffset = `${circumference}`;
+
+      function msFromInputs() {
+        const h = parseInt(hourSelect.value || '0', 10);
+        const m = parseInt(minSelect.value || '0', 10);
+        const s = parseInt(secSelect.value || '0', 10);
+        return ((h * 3600) + (m * 60) + s) * 1000;
+      }
+
+      function renderTimer() {
+        const totalSeconds = Math.max(0, Math.floor(remainingMs / 1000));
+        const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+        const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+        const s = (totalSeconds % 60).toString().padStart(2, '0');
+        hEl.textContent = h;
+        mEl.textContent = m;
+        sEl.textContent = s;
+
+        const ratio = totalMs > 0 ? remainingMs / totalMs : 0;
+        const offset = circumference * (1 - ratio);
+        progressCircle.style.strokeDashoffset = `${offset}`;
+
+        if (ratio <= 0.1) {
+          progressCircle.style.stroke = 'var(--color-danger)';
+        } else {
+          progressCircle.style.stroke = 'var(--color-success)';
+        }
+      }
+
+      function showOverlay() {
+        overlay.classList.add('active');
+      }
+
+      function stopTimer(playSound = false) {
+        running = false;
+        clearInterval(intervalId);
+        intervalId = null;
+        startBtn.classList.remove('hidden');
+        pauseBtn.classList.add('hidden');
+        resetBtn.classList.remove('hidden');
+        if (playSound) {
+          showOverlay();
+          playMelody(selectedMelody);
+        }
+      }
+
+      function tick() {
+        remainingMs -= 1000;
+        if (remainingMs <= 0) {
+          remainingMs = 0;
+          renderTimer();
+          stopTimer(true);
+        } else {
+          renderTimer();
+        }
+      }
+
+      overlayClose.addEventListener('click', () => {
+        overlay.classList.remove('active');
+      });
+
+      startBtn.addEventListener('click', () => {
+        if (running) return;
+        totalMs = msFromInputs();
+        if (!totalMs) return;
+        remainingMs = totalMs;
+        setup.classList.add('hidden');
+        display.classList.remove('hidden');
+
+        startBtn.classList.add('hidden');
+        pauseBtn.classList.remove('hidden');
+        resetBtn.classList.remove('hidden');
+
+        running = true;
+        renderTimer();
+        intervalId = setInterval(tick, 1000);
+      });
+
+      pauseBtn.addEventListener('click', () => {
+        if (!running) return;
+        running = false;
+        clearInterval(intervalId);
+        intervalId = null;
+
+        startBtn.classList.remove('hidden');
+        pauseBtn.classList.add('hidden');
+      });
+
+      resetBtn.addEventListener('click', () => {
+        running = false;
+        clearInterval(intervalId);
+        intervalId = null;
+        setup.classList.remove('hidden');
+        display.classList.add('hidden');
+        startBtn.classList.remove('hidden');
+        pauseBtn.classList.add('hidden');
+        resetBtn.classList.add('hidden');
+        progressCircle.style.strokeDashoffset = `${circumference}`;
+        progressCircle.style.stroke = 'var(--color-success)';
+      });
+
+      function playMelody(id) {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const now = ctx.currentTime;
+
+        function beep(offset, duration, freq, type = 'sine', volume = 0.4) {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, now + offset);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          gain.gain.setValueAtTime(0.0001, now + offset);
+          gain.gain.exponentialRampToValueAtTime(volume, now + offset + 0.01);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + duration);
+          osc.start(now + offset);
+          osc.stop(now + offset + duration + 0.05);
+        }
+
+        if (id === 'simple') {
+          beep(0, 0.5, 800);
+        } else if (id === 'fast') {
+          for (let i = 0; i < 6; i++) {
+            beep(i * 0.15, 0.12, 1000);
+          }
+        } else if (id === 'beep3') {
+          beep(0,    0.2, 700);
+          beep(0.35, 0.2, 700);
+          beep(0.7,  0.3, 900);
+        } else if (id === 'pulseUp') {
+          beep(0,    0.2, 600);
+          beep(0.25, 0.2, 800);
+          beep(0.5,  0.3, 1000);
+        } else if (id === 'alarm') {
+          for (let i = 0; i < 6; i++) {
+            beep(i * 0.35, 0.3, i % 2 === 0 ? 1000 : 1200, 'square', 0.5);
+          }
+        } else if (id === 'arpeggio') {
+          const notes = [523.25, 659.25, 783.99, 1046.5];
+          notes.forEach((freq, index) => {
+            beep(index * 0.35, 0.4, freq, 'sine', 0.35);
+          });
+        } else if (id === 'nature') {
+          const freqs = [880, 1108, 1318, 1760, 1397, 1108, 880];
+          freqs.forEach((freq, index) => {
+            const offset = index * 0.3;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + offset);
+            osc.frequency.exponentialRampToValueAtTime(freq * 0.9, now + offset + 0.3);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            gain.gain.setValueAtTime(0.0001, now + offset);
+            gain.gain.exponentialRampToValueAtTime(0.2, now + offset + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.4);
+            osc.start(now + offset);
+            osc.stop(now + offset + 0.45);
+          });
+        } else if (id === 'victory') {
+          const notes = [523.25, 523.25, 523.25, 415.3, 523.25, 659.25, 783.99];
+          const durations = [0.15, 0.15, 0.15, 0.4, 0.4, 0.4, 0.6];
+          let t = 0;
+          notes.forEach((freq, i) => {
+            beep(t, durations[i], freq, 'square', 0.4);
+            t += durations[i] * 1.05;
+          });
+        } else if (id === 'space') {
+          for (let i = 0; i < 5; i++) {
+            const offset = i * 0.4;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(200 + i * 150, now + offset);
+            osc.frequency.exponentialRampToValueAtTime(600 + i * 200, now + offset + 0.4);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            gain.gain.setValueAtTime(0.0001, now + offset);
+            gain.gain.exponentialRampToValueAtTime(0.25, now + offset + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.4);
+            osc.start(now + offset);
+            osc.stop(now + offset + 0.45);
+          }
+        }
+      }
+
+      function renderMelodyOptions() {
+        optionsContainer.innerHTML = '';
+        melodies.forEach(m => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'melody-btn' + (m.id === selectedMelody ? ' active' : '');
+          btn.innerHTML = `
+            <div class="melody-btn-content">
+              <i class="fas fa-music"></i>
+              <span>${m.label}</span>
+            </div>
+            <button type="button" class="melody-preview-btn">
+              <i class="fas fa-play"></i>
+            </button>
+          `;
+          const preview = btn.querySelector('.melody-preview-btn');
+
+          btn.addEventListener('click', e => {
+            if (e.target === preview || preview.contains(e.target)) return;
+            selectedMelody = m.id;
+            selectedText.textContent = m.label;
+            dropdown.classList.remove('open');
+            renderMelodyOptions();
+          });
+
+          preview.addEventListener('click', e => {
+            e.stopPropagation();
+            playMelody(m.id);
+          });
+
+          optionsContainer.appendChild(btn);
+        });
+      }
+
+      selectedBtn.addEventListener('click', () => {
+        dropdown.classList.toggle('open');
+      });
+
+      document.addEventListener('click', e => {
+        if (!dropdown.contains(e.target) && e.target !== selectedBtn) {
+          dropdown.classList.remove('open');
+        }
+      });
+
+      renderMelodyOptions();
+    }
+
+    function initClock() {
+      const timeEl = document.getElementById('clock-time');
+      const hourHand = document.getElementById('hour-hand');
+      const minuteHand = document.getElementById('minute-hand');
+      const secondHand = document.getElementById('second-hand');
+      const ticksContainer = document.getElementById('clock-ticks');
+      if (!timeEl || !hourHand || !minuteHand || !secondHand || !ticksContainer) return;
+
+      for (let i = 0; i < 60; i++) {
+        const tick = document.createElement('div');
+        tick.className = 'clock-tick' + (i % 5 === 0 ? ' clock-tick-major' : '');
+        tick.style.transform = `translate(-50%, -100%) rotate(${i * 6}deg) translateY(-135px)`;
+        ticksContainer.appendChild(tick);
+      }
+
+      function updateClock() {
+        const now = new Date();
+        const h = now.getHours();
+        const m = now.getMinutes();
+        const s = now.getSeconds();
+        timeEl.textContent = [
+          h.toString().padStart(2, '0'),
+          m.toString().padStart(2, '0'),
+          s.toString().padStart(2, '0')
+        ].join(':');
+
+        const hourDeg = (h % 12) * 30 + m * 0.5;
+        const minuteDeg = m * 6 + s * 0.1;
+        const secondDeg = s * 6;
+
+        hourHand.style.transform = `translateX(-50%) rotate(${hourDeg}deg)`;
+        minuteHand.style.transform = `translateX(-50%) rotate(${minuteDeg}deg)`;
+        secondHand.style.transform = `translateX(-50%) rotate(${secondDeg}deg)`;
+      }
+
+      updateClock();
+      setInterval(updateClock, 1000);
+    }
+  </script>
+</body>
+</html>

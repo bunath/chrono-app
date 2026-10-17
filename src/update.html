@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chrono — Mise à jour</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #020617;
+    color: #e5e7eb;
+    font-family: 'Poppins', sans-serif;
+    width:100vw; height:100vh;
+    overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+    user-select:none;
+    -webkit-app-region: drag;
+  }
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(rgba(37,99,235,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37,99,235,0.04) 1px, transparent 1px);
+    background-size:44px 44px;
+    pointer-events:none;
+  }
+  .glow {
+    position:fixed; width:480px; height:280px;
+    left:50%; top:50%; transform:translate(-50%,-50%);
+    background:radial-gradient(ellipse, rgba(37,99,235,0.1) 0%, transparent 70%);
+    pointer-events:none;
+    animation:glowPulse 3s ease-in-out infinite;
+  }
+  @keyframes glowPulse { 0%,100%{opacity:0.6;transform:translate(-50%,-50%) scale(1)} 50%{opacity:1;transform:translate(-50%,-50%) scale(1.06)} }
+
+  .corner { position:fixed; width:20px; height:20px; opacity:0.2; }
+  .corner.tl { top:14px; left:14px;   border-top:1.5px solid #3b82f6; border-left:1.5px solid #3b82f6; }
+  .corner.tr { top:14px; right:14px;  border-top:1.5px solid #3b82f6; border-right:1.5px solid #3b82f6; }
+  .corner.bl { bottom:14px; left:14px;  border-bottom:1.5px solid #3b82f6; border-left:1.5px solid #3b82f6; }
+  .corner.br { bottom:14px; right:14px; border-bottom:1.5px solid #3b82f6; border-right:1.5px solid #3b82f6; }
+
+  .card {
+    position:relative; z-index:10;
+    width:420px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(37,99,235,0.25);
+    border-radius:18px;
+    padding:28px 28px 22px;
+    display:flex; flex-direction:column; align-items:center;
+    animation:cardIn 0.5s cubic-bezier(0.16,1,0.3,1) both;
+    -webkit-app-region: no-drag;
+  }
+  @keyframes cardIn { from{opacity:0;transform:translateY(18px) scale(0.97)} to{opacity:1;transform:none} }
+
+  .badge {
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(37,99,235,0.1);
+    border:1px solid rgba(59,130,246,0.3);
+    border-radius:20px; padding:3px 12px;
+    font-family:'Share Tech Mono',monospace;
+    font-size:0.6rem; letter-spacing:2px; color:#60a5fa;
+    text-transform:uppercase; margin-bottom:16px;
+  }
+  .badge-dot { width:5px; height:5px; background:#3b82f6; border-radius:50%; animation:blink 1.4s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  .update-icon { font-size:2.8rem; margin-bottom:12px; animation:iconPop 0.5s 0.15s cubic-bezier(0.16,1,0.3,1) both; }
+  @keyframes iconPop { from{opacity:0;transform:scale(0.6)} to{opacity:1;transform:scale(1)} }
+
+  .title {
+    font-size:1.5rem; font-weight:900; letter-spacing:-0.03em;
+    background:linear-gradient(135deg,#3b82f6 0%,#a78bff 50%,#f97316 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    margin-bottom:3px; text-align:center;
+  }
+  .subtitle { font-size:0.74rem; color:rgba(148,163,184,0.6); margin-bottom:18px; }
+
+  .versions {
+    display:flex; align-items:center; gap:14px;
+    margin-bottom:16px; width:100%; justify-content:center;
+  }
+  .ver-box { display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .ver-label { font-family:'Share Tech Mono',monospace; font-size:0.52rem; letter-spacing:2px; color:rgba(148,163,184,0.4); text-transform:uppercase; }
+  .ver-num { font-family:'Share Tech Mono',monospace; font-size:0.95rem; color:rgba(229,231,235,0.6); }
+  .ver-num.new { color:#f97316; font-size:1.1rem; text-shadow:0 0 10px rgba(249,115,22,0.35); }
+  .ver-arrow { color:rgba(59,130,246,0.45); font-size:1.1rem; margin-top:12px; }
+
+  .sep { width:100%; height:1px; background:rgba(59,130,246,0.1); margin:2px 0 16px; }
+
+  .release-notes {
+    width:100%; background:rgba(0,0,0,0.2);
+    border:1px solid rgba(59,130,246,0.1); border-radius:9px;
+    padding:10px 12px; margin-bottom:16px;
+    max-height:80px; overflow-y:auto;
+    scrollbar-width:thin; scrollbar-color:rgba(59,130,246,0.3) transparent;
+  }
+  .rn-title { font-family:'Share Tech Mono',monospace; font-size:0.55rem; letter-spacing:2px; color:rgba(59,130,246,0.5); text-transform:uppercase; margin-bottom:5px; }
+  .rn-body { font-size:0.73rem; color:rgba(229,231,235,0.5); line-height:1.6; white-space:pre-wrap; }
+
+  .progress-zone { width:100%; margin-bottom:16px; display:none; flex-direction:column; gap:7px; }
+  .progress-zone.visible { display:flex; }
+  .progress-label { display:flex; justify-content:space-between; }
+  .progress-status { font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:rgba(249,115,22,0.8); }
+  .progress-percent { font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:rgba(148,163,184,0.5); }
+  .progress-track { width:100%; height:5px; background:rgba(255,255,255,0.05); border-radius:10px; overflow:hidden; }
+  .progress-bar { height:100%; width:0%; background:linear-gradient(90deg,#2563eb,#7c3aed); border-radius:10px; transition:width 0.25s ease; box-shadow:0 0 8px rgba(37,99,235,0.5); }
+  .progress-size { font-size:0.62rem; color:rgba(148,163,184,0.3); text-align:right; font-family:'Share Tech Mono',monospace; }
+
+  .confirm-zone { width:100%; margin-bottom:16px; display:none; flex-direction:column; align-items:center; gap:8px; }
+  .confirm-zone.visible { display:flex; }
+  .confirm-icon { font-size:1.8rem; }
+  .confirm-text { font-size:0.78rem; color:rgba(229,231,235,0.65); text-align:center; line-height:1.6; }
+  .confirm-text strong { color:#10B981; }
+
+  .actions { display:flex; gap:8px; width:100%; }
+  .actions-confirm { display:none; gap:8px; width:100%; }
+
+  .btn {
+    flex:1; padding:10px 0; border-radius:10px;
+    font-family:'Poppins',sans-serif; font-size:0.8rem; font-weight:700;
+    cursor:pointer; border:none;
+    transition:transform 0.12s, box-shadow 0.12s, opacity 0.12s;
+  }
+  .btn:active { transform:scale(0.97); }
+  .btn:disabled { opacity:0.35; cursor:not-allowed; transform:none !important; }
+
+  .btn-skip { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); color:rgba(229,231,235,0.5); }
+  .btn-skip:hover:not(:disabled) { background:rgba(255,255,255,0.08); color:rgba(229,231,235,0.75); }
+  .btn-update { background:linear-gradient(135deg,#2563eb,#7c3aed); color:#fff; box-shadow:0 4px 18px rgba(37,99,235,0.35); }
+  .btn-update:hover:not(:disabled) { box-shadow:0 6px 26px rgba(37,99,235,0.55); transform:translateY(-1px); }
+  .btn-confirm { background:linear-gradient(135deg,#10B981,#059669); color:#fff; box-shadow:0 4px 18px rgba(16,185,129,0.3); }
+  .btn-confirm:hover:not(:disabled) { box-shadow:0 6px 26px rgba(16,185,129,0.45); transform:translateY(-1px); }
+
+  .footer-note { margin-top:10px; font-size:0.58rem; color:rgba(148,163,184,0.2); letter-spacing:1px; text-align:center; font-family:'Share Tech Mono',monospace; }
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<div class="corner tl"></div><div class="corner tr"></div>
+<div class="corner bl"></div><div class="corner br"></div>
+
+<div class="card">
+  <div class="badge"><div class="badge-dot"></div>Nouvelle version disponible</div>
+  <div class="update-icon">🚀</div>
+  <div class="title">Mise à jour disponible</div>
+  <div class="subtitle">Chrono est prêt à évoluer</div>
+
+  <div class="versions">
+    <div class="ver-box">
+      <span class="ver-label">Actuelle</span>
+      <span class="ver-num" id="ver-current">—</span>
+    </div>
+    <div class="ver-arrow">→</div>
+    <div class="ver-box">
+      <span class="ver-label">Nouvelle</span>
+      <span class="ver-num new" id="ver-new">—</span>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <div class="release-notes" id="release-notes-box" style="display:none">
+    <div class="rn-title">Notes de version</div>
+    <div class="rn-body" id="release-body"></div>
+  </div>
+
+  <div class="progress-zone" id="progress-zone">
+    <div class="progress-label">
+      <span class="progress-status" id="progress-status">Téléchargement...</span>
+      <span class="progress-percent" id="progress-percent">0%</span>
+    </div>
+    <div class="progress-track"><div class="progress-bar" id="progress-bar"></div></div>
+    <div class="progress-size" id="progress-size"></div>
+  </div>
+
+  <div class="confirm-zone" id="confirm-zone">
+    <div class="confirm-icon">✅</div>
+    <div class="confirm-text">Téléchargement terminé.<br><strong>L'app va se fermer</strong> pour installer la mise à jour.<br>Confirmes-tu ?</div>
+  </div>
+
+  <div class="actions" id="actions-default">
+    <button class="btn btn-skip" id="btn-skip">Plus tard</button>
+    <button class="btn btn-update" id="btn-update">⬇ Installer la mise à jour</button>
+  </div>
+  <div class="actions-confirm" id="actions-confirm">
+    <button class="btn btn-skip" id="btn-cancel-install">Annuler</button>
+    <button class="btn btn-confirm" id="btn-confirm-install">🚀 Lancer l'installation</button>
+  </div>
+
+  <div class="footer-note" id="footer-note">Téléchargement automatique · Installation en un clic</div>
+</div>
+
+<script>
+  const params   = new URLSearchParams(window.location.search);
+  const currentV = params.get('current') || '?';
+  const newV     = params.get('latest')  || '?';
+  const exeUrl   = params.get('exeUrl')  || '';
+  const body     = params.get('body')    || '';
+
+  document.getElementById('ver-current').textContent = 'v' + currentV;
+  document.getElementById('ver-new').textContent     = 'v' + newV;
+
+  if (body) {
+    document.getElementById('release-body').textContent = decodeURIComponent(body);
+    document.getElementById('release-notes-box').style.display = 'block';
+  }
+
+  function formatBytes(b) {
+    if (!b) return '';
+    return b < 1024*1024 ? (b/1024).toFixed(0)+' Ko' : (b/(1024*1024)).toFixed(1)+' Mo';
+  }
+
+  function setState(state) {
+    const pz  = document.getElementById('progress-zone');
+    const cz  = document.getElementById('confirm-zone');
+    const ad  = document.getElementById('actions-default');
+    const ac  = document.getElementById('actions-confirm');
+    const fn  = document.getElementById('footer-note');
+    pz.classList.remove('visible'); cz.classList.remove('visible');
+    ad.style.display = 'none'; ac.style.display = 'none';
+    if (state === 'default') {
+      ad.style.display = 'flex';
+    } else if (state === 'downloading') {
+      pz.classList.add('visible');
+      document.getElementById('btn-skip').disabled = true;
+      fn.textContent = "Ne fermez pas l'application pendant le téléchargement";
+    } else if (state === 'confirm') {
+      cz.classList.add('visible'); ac.style.display = 'flex';
+      fn.textContent = 'Vos données ne seront pas effacées';
+    } else if (state === 'error') {
+      ad.style.display = 'flex';
+      document.getElementById('btn-update').textContent = '⬇ Réessayer';
+      fn.textContent = 'Erreur — vérifiez votre connexion';
+      fn.style.color = 'rgba(239,68,68,0.5)';
+    }
+  }
+
+  window.updateAPI.onProgress(data => {
+    if (data.percent !== undefined) {
+      const pct = Math.round(data.percent);
+      document.getElementById('progress-bar').style.width = pct + '%';
+      document.getElementById('progress-percent').textContent = pct + '%';
+    }
+    if (data.transferred !== undefined && data.total) {
+      document.getElementById('progress-size').textContent =
+        formatBytes(data.transferred) + ' / ' + formatBytes(data.total);
+    }
+    if (data.status === 'done') setState('confirm');
+    else if (data.status === 'error') setState('error');
+  });
+
+  document.getElementById('btn-update').addEventListener('click', () => {
+    if (!exeUrl) { setState('error'); return; }
+    setState('downloading');
+    window.updateAPI.startDownload(exeUrl, newV);
+  });
+
+  document.getElementById('btn-skip').addEventListener('click', () => window.updateAPI.cancelInstall());
+  document.getElementById('btn-cancel-install').addEventListener('click', () => window.updateAPI.cancelInstall());
+  document.getElementById('btn-confirm-install').addEventListener('click', () => window.updateAPI.launchInstaller());
+</script>
+</body>
+</html>

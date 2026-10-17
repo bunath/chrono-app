@@ -1,0 +1,106 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (optionnel)'
+        required: false
+        default: 'manuel'
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Injecter la version du tag dans package.json
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${TAG#v}"
+          echo "Version : $VERSION"
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('package.json','utf8'));
+            pkg.version = '$VERSION';
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+            console.log('Version mise à jour :', pkg.version);
+          "
+
+      - name: Extraire les notes de version depuis CHANGELOG.md
+        if: startsWith(github.ref, 'refs/tags/')
+        id: changelog
+        shell: bash
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${TAG#v}"
+          # Extraire la section correspondant à la version
+          node -e "
+            const fs = require('fs');
+            const content = fs.readFileSync('CHANGELOG.md', 'utf8');
+            const lines = content.split('\n');
+            let capture = false;
+            let notes = [];
+            for (const line of lines) {
+              if (line.includes('## ') && line.includes('v$VERSION')) {
+                capture = true; continue;
+              }
+              if (capture && line.startsWith('## ')) break;
+              if (capture) notes.push(line);
+            }
+            const result = notes.join('\n').trim();
+            fs.writeFileSync('release-notes.md', result || 'Voir CHANGELOG.md pour les détails.');
+            console.log('Notes extraites :', result.slice(0,80));
+          "
+
+      - name: Installer les dépendances
+        run: npm install
+
+      - name: Build Windows (installeur NSIS + ZIP portable)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+        run: npm run build
+
+      - name: Lister les fichiers générés
+        run: ls dist/
+
+      - name: Publier sur la Release GitHub
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "Chrono ${{ github.ref_name }}"
+          body_path: release-notes.md
+          draft: false
+          prerelease: false
+          files: |
+            dist/*.exe
+            dist/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Artefacts (run manuel)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: chrono-build-manuel
+          path: |
+            dist/*.exe
+            dist/*.zip
+          retention-days: 7

@@ -1,0 +1,5 @@
+Placer ici :
+- icon.ico         (icône multi-résolution)
+- icon.png         (256×256 px, PNG)
+- installer-sidebar.bmp  (164×314 px, BMP 24bit)
+- installer-header.bmp   (150×57 px, BMP 24bit)

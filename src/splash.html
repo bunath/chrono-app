@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body {
+    width:500px; height:320px;
+    background:transparent; overflow:hidden;
+    -webkit-app-region:drag; user-select:none;
+  }
+
+  .shell {
+    width:500px; height:320px;
+    background:#020617;
+    border:1px solid rgba(37,99,235,0.3);
+    border-radius:4px;
+    position:relative;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    overflow:hidden;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.95), 0 0 0 1px rgba(37,99,235,0.1);
+  }
+
+  /* Animated gradient mesh */
+  .mesh {
+    position:absolute; inset:0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(37,99,235,0.12) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 20%, rgba(124,58,237,0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at 60% 80%, rgba(249,115,22,0.06) 0%, transparent 50%);
+    animation: meshPulse 4s ease-in-out infinite alternate;
+  }
+  @keyframes meshPulse {
+    from { opacity:0.6; }
+    to   { opacity:1; }
+  }
+
+  /* Grid lines */
+  .grid {
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(37,99,235,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37,99,235,0.04) 1px, transparent 1px);
+    background-size:40px 40px;
+    animation:gridSlide 8s linear infinite;
+  }
+  @keyframes gridSlide {
+    from { transform:translateY(0); }
+    to   { transform:translateY(40px); }
+  }
+
+  /* Top scanning line */
+  .scanline {
+    position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, transparent 0%, rgba(37,99,235,0.8) 30%, rgba(124,58,237,0.9) 50%, rgba(249,115,22,0.8) 70%, transparent 100%);
+    animation:scan 2.8s ease-in-out forwards;
+  }
+  @keyframes scan {
+    0%   { top:0; opacity:0; }
+    5%   { opacity:1; }
+    95%  { opacity:1; }
+    100% { top:100%; opacity:0; }
+  }
+
+  /* Particles */
+  .particles { position:absolute; inset:0; pointer-events:none; }
+  .p {
+    position:absolute;
+    width:2px; height:2px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.5);
+    animation:rise 3s ease-in infinite;
+  }
+  @keyframes rise {
+    0%   { transform:translateY(0); opacity:0; }
+    10%  { opacity:0.6; }
+    90%  { opacity:0.4; }
+    100% { transform:translateY(-320px); opacity:0; }
+  }
+
+  /* Content */
+  .content {
+    position:relative; z-index:2;
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    animation:appear 0.6s ease 0.3s both;
+  }
+  @keyframes appear {
+    from { opacity:0; transform:translateY(16px) scale(0.96); }
+    to   { opacity:1; transform:translateY(0) scale(1); }
+  }
+
+  .icon-ring {
+    width:72px; height:72px;
+    border:2px solid rgba(37,99,235,0.4);
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+    margin-bottom:8px;
+  }
+  .icon-ring::before {
+    content:'';
+    position:absolute; inset:-6px;
+    border:1px solid rgba(37,99,235,0.15);
+    border-radius:50%;
+    animation:ringPulse 2s ease-in-out infinite;
+  }
+  @keyframes ringPulse {
+    0%,100% { transform:scale(1); opacity:0.5; }
+    50%      { transform:scale(1.08); opacity:1; }
+  }
+  .icon-ring::after {
+    content:'';
+    position:absolute; inset:-2px;
+    border-radius:50%;
+    border:2px solid transparent;
+    border-top-color:rgba(249,115,22,0.8);
+    animation:spin 1.5s linear infinite;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  .clock-svg {
+    width:36px; height:36px;
+    stroke:#e5e7eb; fill:none; stroke-linecap:round;
+    animation:tickHand 1s steps(60,end) infinite;
+  }
+  @keyframes tickHand {
+    from { transform:rotate(0deg); }
+    to   { transform:rotate(360deg); }
+  }
+
+  .app-name {
+    font-family:'Poppins',system-ui,sans-serif;
+    font-size:1.9rem; font-weight:900;
+    letter-spacing:-0.04em;
+    color:#e5e7eb;
+    text-shadow:0 0 30px rgba(37,99,235,0.5);
+  }
+  .app-name span { color:#f97316; }
+
+  .tagline {
+    font-family:'Poppins',system-ui,sans-serif;
+    font-size:0.62rem; letter-spacing:0.45em;
+    color:rgba(156,163,175,0.6); text-transform:uppercase;
+    margin-bottom:20px;
+  }
+
+  .progress-track {
+    width:240px; height:2px;
+    background:rgba(255,255,255,0.06); border-radius:2px;
+    overflow:hidden; position:relative;
+  }
+  .progress-fill {
+    height:100%; border-radius:2px;
+    background:linear-gradient(90deg, #2563eb, #7c3aed, #f97316);
+    animation:fillUp 2.7s cubic-bezier(0.4,0,0.2,1) forwards;
+  }
+  @keyframes fillUp {
+    0%   { width:0%; }
+    25%  { width:30%; }
+    50%  { width:55%; }
+    75%  { width:78%; }
+    100% { width:100%; }
+  }
+
+  .status {
+    font-family:'Poppins',system-ui,sans-serif;
+    font-size:0.55rem; letter-spacing:0.35em;
+    color:rgba(99,130,175,0.5); text-transform:uppercase;
+    margin-top:10px; height:1em;
+    animation:blink 1.2s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%,100% { opacity:0.4; }
+    50%      { opacity:0.9; }
+  }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="shell">
+  <div class="mesh"></div>
+  <div class="grid"></div>
+  <div class="scanline"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="content">
+    <div class="icon-ring">
+      <svg class="clock-svg" viewBox="0 0 24 24" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+    </div>
+    <div class="app-name">CHR<span>O</span>NO</div>
+    <div class="tagline">Chargement en cours</div>
+    <div class="progress-track">
+      <div class="progress-fill"></div>
+    </div>
+    <div class="status" id="status">Initialisation…</div>
+  </div>
+</div>
+
+<script>
+  // Particles
+  const c = document.getElementById('particles');
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'p';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.bottom = '-4px';
+    p.style.animationDelay = Math.random() * 3 + 's';
+    p.style.animationDuration = 2 + Math.random() * 2 + 's';
+    p.style.opacity = 0.3 + Math.random() * 0.4;
+    c.appendChild(p);
+  }
+
+  const msgs = ['Initialisation…','Chargement des modules…','Démarrage de l\'interface…','Prêt'];
+  let i = 0;
+  const s = document.getElementById('status');
+  const id = setInterval(() => {
+    if (++i < msgs.length) { s.textContent = msgs[i]; }
+    else clearInterval(id);
+  }, 750);
+</script>
+</body>
+</html>
