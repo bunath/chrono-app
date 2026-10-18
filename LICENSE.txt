@@ -1,2 +1,1 @@
-Chrono App — Logiciel privé
-Tous droits réservés.
+MIT License — Chrono App — nathbu92

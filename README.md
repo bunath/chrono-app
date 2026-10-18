@@ -1,69 +1,75 @@
-# Chrono — Application de bureau
+# Chrono — Application Tauri
 
-Chronomètre · Minuteur · Horloge — construite avec Electron.
+Chronomètre · Minuteur · Horloge — migré de Electron vers **Tauri 2**
 
-## Fonctionnalités
+## Avantages de Tauri vs Electron
+| | Electron | Tauri |
+|---|---|---|
+| Taille bundle | ~80 Mo | ~5 Mo |
+| RAM au démarrage | ~120 Mo | ~30 Mo |
+| Moteur | Chromium embarqué | WebView2 natif Windows |
+| Backend | Node.js | Rust |
 
-### Chronomètre
-- Préréglages nommés (localStorage)
-- Centièmes affichés à la pause
-- Plein écran in-app
+## Prérequis développement
 
-### Minuteur
-- **Préréglages stockés en SQLite** (persistents entre sessions)
-- Mélodie de fin synthétisée (9 mélodies)
-- **Musique locale** : choisissez un fichier audio (mp3, wav, ogg…) depuis votre ordinateur
-- Cercle animé, plein écran
+### Windows
+```bash
+# 1. Rust
+https://rustup.rs
 
-### Horloge
-- Analogique + numérique
-- 31 fuseaux horaires
-- **Zoom réglable** (80 % → 180 %)
+# 2. WebView2 (déjà installé sur Windows 10/11)
 
-## Nouvelles fonctionnalités v2
+# 3. Node.js 20+
+https://nodejs.org
 
-### Barre de menu native
-Menu Fichier / Affichage / Aide entièrement natif Windows.  
-**F11** = plein écran (géré côté Electron, fonctionne même avec la fenêtre sans cadre).
-
-### Couleurs personnalisées
-Modifiez les 6 couleurs de l'interface (primaire, secondaire, accent, succès, danger, texte) depuis Paramètres → sauvegardées en base de données.
-
-### Police d'affichage
-6 polices préchargées : Poppins, Orbitron, Share Tech Mono, Rajdhani, Exo 2, Inter.
-
-### Double écran
-Détecte automatiquement si deux écrans sont branchés. En cas de mode "Dupliquer", déplace l'app en plein écran sur l'écran secondaire. Bouton "Revenir" ramène sur l'écran principal.
-
-### Mises à jour automatiques (depuis GitHub)
-Via `electron-updater`. Configurez le champ `publish` dans `package.json` :
-
-```json
-"publish": [{
-  "provider": "github",
-  "owner": "votre-utilisateur",
-  "repo": "chrono-app"
-}]
+# 4. Visual Studio Build Tools (C++)
+https://visualstudio.microsoft.com/visual-cpp-build-tools/
 ```
 
-Lors d'un build, publiez via `electron-builder --publish always`.  
-Dans l'app : Paramètres → Mises à jour → Vérifier.
-
-## Installation & lancement
-
+## Lancer en développement
 ```bash
 npm install
-npm start
+npm run dev
 ```
 
-## Build Windows
-
+## Builder
 ```bash
 npm run build
+# → src-tauri/target/release/bundle/nsis/Chrono_1.5.0_x64-setup.exe
 ```
 
-## Base de données
+## Publier une MAJ
+```bash
+git tag v1.5.0
+git push origin v1.5.0
+# GitHub Actions build et publie automatiquement
+```
 
-SQLite via `better-sqlite3`, stocké dans `%APPDATA%\ChronoApp\chrono.db`.  
-Tables : `timer_presets`, `settings`.
+## Structure
+```
+chrono-tauri/
+├── src/                    # Frontend HTML/CSS/JS (inchangé vs Electron)
+│   ├── index.html          # Application principale
+│   ├── update.html         # Fenêtre de mise à jour
+│   └── assets/             # Icônes, images
+├── src-tauri/              # Backend Rust
+│   ├── src/
+│   │   ├── main.rs         # Point d'entrée
+│   │   └── lib.rs          # Commandes Tauri (DB, MAJ, écrans…)
+│   ├── Cargo.toml
+│   └── tauri.conf.json
+└── .github/workflows/
+    └── build.yml           # CI/CD automatique
+```
 
+## Différences avec la version Electron
+
+Le frontend est **identique** — seul le pont IPC change :
+- Electron : `window.electronAPI.xxx()`
+- Tauri : `window.__TAURI__.core.invoke('xxx', args)`
+
+Un shim de compatibilité en haut de `index.html` maintient la même interface.
+
+## Base de données SQLite
+Stockée dans `%AppData%\com.chrono.app\chrono.db`
+Tables : `timer_presets`, `settings`

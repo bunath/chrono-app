@@ -1,49 +1,13 @@
 {
-  "name": "chrono-app",
-  "version": "1.4.0",
-  "description": "Chronomètre, minuteur, horloge — application de bureau",
-  "author": "nathbu92",
-  "main": "src/main.js",
+  "name": "chrono-tauri",
+  "version": "1.5.0",
+  "description": "Chrono — Chronomètre, minuteur, horloge",
   "scripts": {
-    "start": "electron .",
-    "build": "electron-builder --win --x64"
-  },
-  "build": {
-    "appId": "com.chrono.app",
-    "productName": "Chrono",
-    "directories": { "output": "dist" },
-    "files": ["src/**/*", "node_modules/**/*"],
-    "win": {
-      "target": [
-        { "target": "nsis", "arch": ["x64"] },
-        { "target": "zip",  "arch": ["x64"] }
-      ],
-      "icon": "src/assets/icon.ico",
-      "requestedExecutionLevel": "asInvoker"
-    },
-    "nsis": {
-      "oneClick": false,
-      "perMachine": false,
-      "allowToChangeInstallationDirectory": false,
-      "installerLanguages": ["fr"],
-      "language": "1036",
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "shortcutName": "Chrono",
-      "license": "LICENSE.txt",
-      "deleteAppDataOnUninstall": false,
-      "runAfterFinish": true,
-      "installerIcon": "src/assets/icon.ico",
-      "uninstallerIcon": "src/assets/icon.ico",
-      "installerSidebar": "src/assets/installer-sidebar.bmp",
-      "installerHeader": "src/assets/installer-header.bmp"
-    }
-  },
-  "dependencies": {
-    "better-sqlite3": "^9.4.3"
+    "tauri": "tauri",
+    "dev": "tauri dev",
+    "build": "tauri build"
   },
   "devDependencies": {
-    "electron": "^28.0.0",
-    "electron-builder": "^24.0.0"
+    "@tauri-apps/cli": "^2"
   }
 }

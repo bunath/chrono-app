@@ -1,0 +1,55 @@
+{
+  "productName": "Chrono",
+  "version": "1.5.0",
+  "identifier": "com.chrono.app",
+  "build": {
+    "frontendDist": "../src"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "Chrono",
+        "url": "index.html",
+        "width": 1280,
+        "height": 860,
+        "minWidth": 800,
+        "minHeight": 600,
+        "decorations": true,
+        "visible": false,
+        "center": true,
+        "resizable": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis", "app"],
+    "icon": [
+      "icons/icon.ico",
+      "icons/icon.png"
+    ],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": ["French"],
+        "displayLanguageSelector": false,
+        "shortcutName": "Chrono",
+        "createDesktopShortcut": "always",
+        "license": "../LICENSE.txt",
+        "sidebarImage": "../src/assets/installer-sidebar.bmp",
+        "headerImage": "../src/assets/installer-header.bmp"
+      }
+    }
+  },
+  "plugins": {
+    "shell": {
+      "all": true,
+      "open": "^https?://"
+    }
+  }
+}

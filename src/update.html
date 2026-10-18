@@ -238,7 +238,7 @@
     }
   }
 
-  window.updateAPI.onProgress(data => {
+  if(window.__TAURI__) window.__TAURI__.event.listen('update-progress', e => { const data=e.payload;
     if (data.percent !== undefined) {
       const pct = Math.round(data.percent);
       document.getElementById('progress-bar').style.width = pct + '%';
@@ -255,12 +255,13 @@
   document.getElementById('btn-update').addEventListener('click', () => {
     if (!exeUrl) { setState('error'); return; }
     setState('downloading');
-    window.updateAPI.startDownload(exeUrl, newV);
+    const invoke = window.__TAURI__?.core?.invoke;
+      if(invoke) invoke('download_update',{url:exeUrl,version:newV});
   });
 
-  document.getElementById('btn-skip').addEventListener('click', () => window.updateAPI.cancelInstall());
-  document.getElementById('btn-cancel-install').addEventListener('click', () => window.updateAPI.cancelInstall());
-  document.getElementById('btn-confirm-install').addEventListener('click', () => window.updateAPI.launchInstaller());
+  document.getElementById('btn-skip').addEventListener('click', () => window.__TAURI__?.core?.invoke('cancel_download'));
+  document.getElementById('btn-cancel-install').addEventListener('click', () => window.__TAURI__?.core?.invoke('cancel_download'));
+  document.getElementById('btn-confirm-install').addEventListener('click', () => window.__TAURI__?.core?.invoke('launch_installer'));
 </script>
 </body>
 </html>
