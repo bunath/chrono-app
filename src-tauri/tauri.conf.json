@@ -29,6 +29,7 @@
   "bundle": {
     "active": true,
     "targets": ["nsis", "app"],
+    "licenseFile": "../LICENSE.txt",
     "icon": [
       "icons/icon.ico",
       "icons/icon.png"
@@ -38,9 +39,6 @@
         "installMode": "currentUser",
         "languages": ["French"],
         "displayLanguageSelector": false,
-        "shortcutName": "Chrono",
-        "createDesktopShortcut": "always",
-        "license": "../LICENSE.txt",
         "sidebarImage": "../src/assets/installer-sidebar.bmp",
         "headerImage": "../src/assets/installer-header.bmp"
       }
