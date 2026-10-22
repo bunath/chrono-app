@@ -84,6 +84,15 @@ async fn pick_music_file(app: AppHandle) -> Option<String> {
     rx.recv().ok()?.map(|p| p.to_string())
 }
 
+// ── Dossier Téléchargements (sans dépendance externe) ─────────
+fn downloads_dir() -> PathBuf {
+    // Windows : USERPROFILE\Downloads, fallback HOME\Downloads, fallback .
+    std::env::var("USERPROFILE")
+        .or_else(|_| std::env::var("HOME"))
+        .map(|h| PathBuf::from(h).join("Downloads"))
+        .unwrap_or_else(|_| PathBuf::from("."))
+}
+
 // ── Téléchargement MAJ ────────────────────────────────────────
 static DOWNLOAD_PATH: OnceCell<Mutex<Option<PathBuf>>> = OnceCell::new();
 
@@ -93,12 +102,10 @@ fn dl_path() -> std::sync::MutexGuard<'static, Option<PathBuf>> {
 
 #[tauri::command]
 async fn download_update(url: String, version: String, app: AppHandle) -> Result<(), String> {
-    let downloads = dirs_next::download_dir()
-        .unwrap_or_else(|| PathBuf::from("."));
-    let dest = downloads.join(format!("Chrono-Setup-{}.exe", version));
+    let dest = downloads_dir().join(format!("Chrono-Setup-{}.exe", version));
 
     let client = reqwest::Client::new();
-    let mut resp = client.get(&url)
+    let resp = client.get(&url)
         .header("User-Agent", "chrono/1.5")
         .send().await.map_err(|e| e.to_string())?;
 
@@ -107,7 +114,8 @@ async fn download_update(url: String, version: String, app: AppHandle) -> Result
     let mut received: u64 = 0;
 
     use tokio::io::AsyncWriteExt;
-    while let Some(chunk) = resp.chunk().await.map_err(|e| e.to_string())? {
+    let mut stream = resp;
+    while let Some(chunk) = stream.chunk().await.map_err(|e| e.to_string())? {
         file.write_all(&chunk).await.map_err(|e| e.to_string())?;
         received += chunk.len() as u64;
         let pct = if total > 0 { received * 100 / total } else { 0 };
@@ -144,14 +152,20 @@ fn get_app_version() -> String {
     env!("CARGO_PKG_VERSION").to_string()
 }
 
+// ── Helper : nom du moniteur en &str ─────────────────────────
+fn monitor_name(m: &tauri::Monitor) -> &str {
+    m.name().map(|s| s.as_str()).unwrap_or("")
+}
+
 // ── Écrans secondaires ────────────────────────────────────────
 #[tauri::command]
 fn get_displays(app: AppHandle) -> serde_json::Value {
     let monitors = app.available_monitors().unwrap_or_default();
-    let primary = app.primary_monitor().ok().flatten();
-    let pname = primary.as_ref().map(|m| m.name().unwrap_or_default());
+    let primary  = app.primary_monitor().ok().flatten();
+    let pname    = primary.as_ref().map(|m| monitor_name(m).to_owned());
+
     let list: Vec<_> = monitors.iter().enumerate().map(|(i, m)| {
-        let name = m.name().unwrap_or_default();
+        let name       = monitor_name(m);
         let is_primary = pname.as_deref() == Some(name);
         serde_json::json!({
             "index": i,
@@ -160,7 +174,7 @@ fn get_displays(app: AppHandle) -> serde_json::Value {
             "bounds": {
                 "x": m.position().x,
                 "y": m.position().y,
-                "width": m.size().width,
+                "width":  m.size().width,
                 "height": m.size().height
             }
         })
@@ -172,10 +186,12 @@ fn get_displays(app: AppHandle) -> serde_json::Value {
 fn move_to_second_screen(app: AppHandle) -> serde_json::Value {
     let monitors = app.available_monitors().unwrap_or_default();
     let primary  = app.primary_monitor().ok().flatten();
-    let pname = primary.as_ref().map(|m| m.name().unwrap_or_default());
+    let pname    = primary.as_ref().map(|m| monitor_name(m).to_owned());
+
     let secondary = monitors.iter().find(|m| {
-        pname.as_deref() != Some(m.name().unwrap_or_default())
+        pname.as_deref() != Some(monitor_name(m))
     });
+
     if let Some(mon) = secondary {
         let pos  = mon.position();
         let size = mon.size();
@@ -208,7 +224,6 @@ pub fn run() {
         .setup(|app| {
             init_db(app.handle());
             let win = app.get_webview_window("main").unwrap();
-            // Afficher la fenêtre après 3s (comme le splash Electron)
             let win2 = win.clone();
             std::thread::spawn(move || {
                 std::thread::sleep(std::time::Duration::from_millis(800));
