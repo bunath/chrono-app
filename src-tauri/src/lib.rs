@@ -223,13 +223,11 @@ pub fn run() {
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .setup(|app| {
             init_db(app.handle());
-            let win = app.get_webview_window("main").unwrap();
-            let win2 = win.clone();
-            std::thread::spawn(move || {
-                std::thread::sleep(std::time::Duration::from_millis(800));
-                win2.show().ok();
-                win2.set_focus().ok();
-            });
+            // La fenêtre est visible:true dans tauri.conf.json
+            // On force le focus au cas où
+            if let Some(win) = app.get_webview_window("main") {
+                win.set_focus().ok();
+            }
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

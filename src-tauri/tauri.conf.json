@@ -17,9 +17,10 @@
         "minWidth": 800,
         "minHeight": 600,
         "decorations": true,
-        "visible": false,
+        "visible": true,
         "center": true,
-        "resizable": true
+        "resizable": true,
+        "focus": true
       }
     ],
     "security": {
@@ -28,7 +29,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis", "app"],
+    "targets": ["nsis"],
     "licenseFile": "../LICENSE.txt",
     "icon": [
       "icons/icon.ico",
@@ -39,6 +40,7 @@
         "installMode": "currentUser",
         "languages": ["French"],
         "displayLanguageSelector": false,
+        "runAfterFinish": true,
         "sidebarImage": "../src/assets/installer-sidebar.bmp",
         "headerImage": "../src/assets/installer-header.bmp"
       }
