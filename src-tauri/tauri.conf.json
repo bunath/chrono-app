@@ -37,10 +37,7 @@
     "windows": {
       "nsis": {
         "installMode": "currentUser",
-        "languages": ["French"],
-        "displayLanguageSelector": false,
-        "runAfterFinish": true,
-        "license": "../LICENSE.txt"
+        "runAfterFinish": true
       }
     }
   },
