@@ -30,7 +30,6 @@
   "bundle": {
     "active": true,
     "targets": ["nsis"],
-    "licenseFile": "../LICENSE.txt",
     "icon": [
       "icons/icon.ico",
       "icons/icon.png"
@@ -41,8 +40,7 @@
         "languages": ["French"],
         "displayLanguageSelector": false,
         "runAfterFinish": true,
-        "sidebarImage": "../src/assets/installer-sidebar.bmp",
-        "headerImage": "../src/assets/installer-header.bmp"
+        "license": "../LICENSE.txt"
       }
     }
   },
