@@ -33,13 +33,7 @@
     "icon": [
       "icons/icon.ico",
       "icons/icon.png"
-    ],
-    "windows": {
-      "nsis": {
-        "installMode": "currentUser",
-        "runAfterFinish": true
-      }
-    }
+    ]
   },
   "plugins": {
     "shell": {
