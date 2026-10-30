@@ -214,19 +214,51 @@ fn restore_primary_screen(app: AppHandle) {
     }
 }
 
+// ── Journal de plantage (la version release n'a pas de console) ──
+fn install_crash_logger() {
+    std::panic::set_hook(Box::new(|info| {
+        use std::io::Write;
+        let base = std::env::var("LOCALAPPDATA")
+            .or_else(|_| std::env::var("HOME"))
+            .map(PathBuf::from)
+            .unwrap_or_else(|_| PathBuf::from("."));
+        let dir = base.join("com.chrono.app");
+        let _ = std::fs::create_dir_all(&dir);
+        if let Ok(mut f) = std::fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(dir.join("crash.log"))
+        {
+            let _ = writeln!(f, "{}", info);
+        }
+    }));
+}
+
+// ── Plein écran (bouton + F11) ────────────────────────────────
+#[tauri::command]
+fn toggle_fullscreen(app: AppHandle) -> serde_json::Value {
+    if let Some(win) = app.get_webview_window("main") {
+        let now = win.is_fullscreen().unwrap_or(false);
+        win.set_fullscreen(!now).ok();
+        return serde_json::json!({ "fullscreen": !now });
+    }
+    serde_json::json!({ "fullscreen": false })
+}
+
 // ── Setup ─────────────────────────────────────────────────────
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    install_crash_logger();
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_window_state::Builder::default().build())
         .setup(|app| {
             init_db(app.handle());
-            // La fenêtre est visible:true dans tauri.conf.json
-            // On force le focus au cas où
+            // Force l'affichage et le focus de la fenêtre principale
             if let Some(win) = app.get_webview_window("main") {
-                win.set_focus().ok();
+                win.show().unwrap_or_default();
+                win.set_focus().unwrap_or_default();
+                win.center().unwrap_or_default();
             }
             Ok(())
         })
@@ -237,6 +269,7 @@ pub fn run() {
             download_update, launch_installer, cancel_download,
             get_app_version,
             get_displays, move_to_second_screen, restore_primary_screen,
+            toggle_fullscreen,
         ])
         .run(tauri::generate_context!())
         .expect("Erreur Tauri");

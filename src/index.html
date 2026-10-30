@@ -948,7 +948,7 @@ const convertFileSrc = _tauri ? _tauri.core.convertFileSrc : (p) => 'file://' + 
 // Interface identique à l'ancienne version Electron
 if (invoke && !window.electronAPI) {
   window.electronAPI = {
-    toggleFullscreen:    ()           => invoke('tauri:window:set_fullscreen'),
+    toggleFullscreen:    ()           => invoke('toggle_fullscreen'),
     getDisplays:         ()           => invoke('get_displays'),
     moveToSecondScreen:  ()           => invoke('move_to_second_screen'),
     restorePrimary:      ()           => invoke('restore_primary_screen'),
@@ -1172,7 +1172,7 @@ function initFullscreen(){
         toggleBox(box,btn);
       });
     }
-    if(e.key==='F11'&&!window.electronAPI){
+    if(e.key==='F11'){
       e.preventDefault();toggleFsOS();
     }
   });

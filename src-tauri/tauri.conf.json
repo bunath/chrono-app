@@ -33,12 +33,20 @@
     "icon": [
       "icons/icon.ico",
       "icons/icon.png"
-    ]
-  },
-  "plugins": {
-    "shell": {
-      "all": true,
-      "open": "^https?://"
+    ],
+    "windows": {
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper",
+        "silent": true
+      },
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": ["French"],
+        "displayLanguageSelector": false,
+        "installerIcon": "icons/icon.ico",
+        "sidebarImage": "../src/assets/installer-sidebar.bmp",
+        "headerImage": "../src/assets/installer-header.bmp"
+      }
     }
   }
 }
