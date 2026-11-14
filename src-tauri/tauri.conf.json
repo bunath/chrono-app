@@ -1,6 +1,6 @@
 {
   "productName": "Chrono",
-  "version": "1.5.0",
+  "version": "2.0.0",
   "identifier": "com.chrono.app",
   "build": {
     "devUrl": "http://127.0.0.1:1420",
