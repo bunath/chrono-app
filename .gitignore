@@ -1,15 +1,43 @@
+﻿# Dependencies
 node_modules/
-dist/
 .pnpm-store/
 
-# Rust / Tauri
-/src-tauri/target/
-/src-tauri/gen/
+# Build
+dist/
+dist-ssr/
+build/
+coverage/
 
-# Local files
+# Tauri / Rust
+src-tauri/target/
+target/
+
+# Cache
+.vite/
+.turbo/
+.cache/
+.eslintcache/
+
+# Environment
 .env
 .env.*
 !.env.example
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+
+# IDE
+.vscode/
+.idea/
+
+# OS
 .DS_Store
 Thumbs.db
-*.log
+Desktop.ini
+
+# Temporary
+*.tmp
+*.bak
