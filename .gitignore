@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.pnpm-store/
+
+# Rust / Tauri
+/src-tauri/target/
+/src-tauri/gen/
+
+# Local files
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+*.log

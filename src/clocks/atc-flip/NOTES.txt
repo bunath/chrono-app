@@ -1,0 +1,2 @@
+Les polices d'origine (ATC Duel, ATC Timberline, Avondale Type Co.) ne sont pas disponibles hors connexion :
+elles sont remplacées par Poppins (embarquée). La partie « radio » du pen d'origine a été retirée.

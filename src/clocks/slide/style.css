@@ -1,0 +1,54 @@
+:root {
+  --size: 86px;
+}
+html {
+  height: 100%;
+}
+body {
+  margin: 0;
+  height: 100%;
+  text-align: center;
+  background-color: #0e141b;
+  color: rgba(224, 230, 235, 0.89);
+  font-family: "Roboto Condensed", sans-serif;
+  font-weight: 300;
+  overflow: hidden;
+}
+
+.column,
+.colon {
+  display: inline-block;
+  vertical-align: top;
+  font-size: var(--size);
+  line-height: var(--size);
+}
+
+.column {
+  transition: transform 300ms;
+}
+
+.colon {
+  transition: transform 300ms;
+  transform: translateY(calc(50vh - var(--size) / 2));
+}
+.colon:after {
+  content: ":";
+}
+
+.num {
+  transition: opacity 500ms, text-shadow 100ms;
+  opacity: 0.025;
+}
+.num.visible {
+  opacity: 1;
+  text-shadow: 1px 1px 0px #336699;
+}
+.num.close {
+  opacity: 0.35;
+}
+.num.far {
+  opacity: 0.15;
+}
+.num.distant {
+  opacity: 0.1;
+}

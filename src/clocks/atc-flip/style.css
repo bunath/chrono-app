@@ -1,0 +1,514 @@
+/* --u remplace l'unité "vmin" du pen d'origine ; elle est recalculée selon la taille de la fenêtre. */
+html { --u: 6px; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #6fd1b5; }
+body { font-family: "Poppins", sans-serif; font-weight: 600; text-align: center; }
+#stage {
+  position: absolute;
+  left: calc(50% - 63.5 * var(--u));
+  top: calc(50% - 21 * var(--u));
+  width: calc(110 * var(--u));
+  height: calc(42 * var(--u));
+}
+
+.minutes,
+.hours,
+.unites,
+.dizaines,
+.number,
+.logo,
+.btn,
+.seconds-wrapper,
+.seconds,
+.second,
+.seconds-wrapper:before,
+.clock-wrapper:before,
+.clock-wrapper:after,
+.up,
+.down,
+.digit,
+.knob,
+.knob-lines,
+.hours:before,
+.bg {
+  position: absolute;
+}
+
+.clock-wrapper {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  left: calc(22 * var(--u));
+  top: calc(5.5 * var(--u));
+  margin: 0;
+  width: calc(83 * var(--u));
+  height: calc(26.5 * var(--u));
+}
+.clock-wrapper:before {
+  right: calc(5 * var(--u));
+  bottom: calc(-4 * var(--u));
+  left: calc(5 * var(--u));
+  display: block;
+  height: calc(4 * var(--u));
+  background: #eadfb5;
+  border-top: calc(1 * var(--u)) solid #6ac5a9;
+  content: "";
+  transform: perspective(calc(33 * var(--u))) rotateX(10deg);
+}
+.clock-wrapper:after {
+  bottom: calc(-4 * var(--u));
+  z-index: -1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #6ac5a9;
+  border-radius: calc(1 * var(--u));
+  content: "";
+  transform: perspective(calc(100 * var(--u))) rotateX(60deg) skew(60deg);
+  transform-origin: bottom right;
+}
+.clock-wrapper .bg {
+  width: 100%;
+  height: 100%;
+  background: #eeead1;
+  border-radius: calc(1 * var(--u));
+}
+
+.seconds-wrapper {
+  top: calc(5 * var(--u));
+  right: calc(16 * var(--u));
+  bottom: calc(5 * var(--u));
+  width: calc(8 * var(--u));
+  overflow: hidden;
+  background: #472c4b;
+  border-radius: calc(0.5 * var(--u));
+}
+.seconds-wrapper:before {
+  top: 50%;
+  left: 0;
+  z-index: 1;
+  display: block;
+  border: calc(1 * var(--u)) solid transparent;
+  border-right-width: calc(3.66 * var(--u));
+  border-left: calc(3.66 * var(--u)) solid #f85302;
+  content: "";
+  transform: translateY(-50%);
+}
+
+.seconds {
+  top: 50%;
+  margin-top: calc(1.3 * var(--u));
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  animation: secondsTick 60s infinite linear;
+  animation-play-state: paused;
+}
+
+
+
+
+@keyframes secondsTick {
+  0% {
+    transform: rotateX(0deg);
+  }
+  100% {
+    transform: rotateX(-360deg);
+  }
+}
+.second {
+  font-size: calc(1.5 * var(--u));
+  color: #fdb800;
+  text-align: center;
+  white-space: nowrap;
+  line-height: calc(2.6 * var(--u));
+  letter-spacing: 0.05em;
+  backface-visibility: hidden;
+}
+.second:before {
+  display: inline-block;
+  margin: calc(-0.3 * var(--u)) calc(1.3 * var(--u)) 0 calc(1 * var(--u));
+  width: calc(2.6 * var(--u));
+  height: calc(0.26 * var(--u));
+  background: currentColor;
+  content: "";
+  vertical-align: middle;
+}
+.second:nth-child(1) {
+  transform: rotateX(6deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(2) {
+  transform: rotateX(12deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(3) {
+  transform: rotateX(18deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(4) {
+  transform: rotateX(24deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(5) {
+  transform: rotateX(30deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(6) {
+  transform: rotateX(36deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(7) {
+  transform: rotateX(42deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(8) {
+  transform: rotateX(48deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(9) {
+  transform: rotateX(54deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(10) {
+  transform: rotateX(60deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(11) {
+  transform: rotateX(66deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(12) {
+  transform: rotateX(72deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(13) {
+  transform: rotateX(78deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(14) {
+  transform: rotateX(84deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(15) {
+  transform: rotateX(90deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(16) {
+  transform: rotateX(96deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(17) {
+  transform: rotateX(102deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(18) {
+  transform: rotateX(108deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(19) {
+  transform: rotateX(114deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(20) {
+  transform: rotateX(120deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(21) {
+  transform: rotateX(126deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(22) {
+  transform: rotateX(132deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(23) {
+  transform: rotateX(138deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(24) {
+  transform: rotateX(144deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(25) {
+  transform: rotateX(150deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(26) {
+  transform: rotateX(156deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(27) {
+  transform: rotateX(162deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(28) {
+  transform: rotateX(168deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(29) {
+  transform: rotateX(174deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(30) {
+  transform: rotateX(180deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(31) {
+  transform: rotateX(186deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(32) {
+  transform: rotateX(192deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(33) {
+  transform: rotateX(198deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(34) {
+  transform: rotateX(204deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(35) {
+  transform: rotateX(210deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(36) {
+  transform: rotateX(216deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(37) {
+  transform: rotateX(222deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(38) {
+  transform: rotateX(228deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(39) {
+  transform: rotateX(234deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(40) {
+  transform: rotateX(240deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(41) {
+  transform: rotateX(246deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(42) {
+  transform: rotateX(252deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(43) {
+  transform: rotateX(258deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(44) {
+  transform: rotateX(264deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(45) {
+  transform: rotateX(270deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(46) {
+  transform: rotateX(276deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(47) {
+  transform: rotateX(282deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(48) {
+  transform: rotateX(288deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(49) {
+  transform: rotateX(294deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(50) {
+  transform: rotateX(300deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(51) {
+  transform: rotateX(306deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(52) {
+  transform: rotateX(312deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(53) {
+  transform: rotateX(318deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(54) {
+  transform: rotateX(324deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(55) {
+  transform: rotateX(330deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(56) {
+  transform: rotateX(336deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(57) {
+  transform: rotateX(342deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(58) {
+  transform: rotateX(348deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(59) {
+  transform: rotateX(354deg) translateZ(calc(24.737347581 * var(--u)));
+}
+.second:nth-child(60) {
+  transform: rotateX(360deg) translateZ(calc(24.737347581 * var(--u)));
+}
+
+.btn {
+  top: calc(12.5 * var(--u));
+  right: calc(5 * var(--u));
+  padding: calc(1.3 * var(--u)) 0 calc(1.1 * var(--u));
+  width: calc(6.5 * var(--u));
+  background: currentColor;
+  box-shadow: inset 0 0 calc(3 * var(--u)) rgba(0, 0, 0, 0.2), 0 0 calc(6 * var(--u)) rgba(118, 255, 204, 0.75);
+  color: #10ffa6;
+  line-height: 1;
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-size: calc(1.8 * var(--u));
+  text-transform: uppercase;
+  text-align: center;
+}
+.btn span {
+  color: white;
+  transition: color 0.3s;
+}
+
+.logo {
+  top: calc(5 * var(--u));
+  right: calc(5 * var(--u));
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  color: #472c4b;
+  text-transform: uppercase;
+  font-size: calc(2.6 * var(--u));
+  line-height: 1;
+}
+
+.minutes,
+.hours {
+  top: calc(5 * var(--u));
+  bottom: calc(5 * var(--u));
+  width: calc(25 * var(--u));
+}
+
+.minutes {
+  right: calc(26 * var(--u));
+}
+
+.hours {
+  left: calc(5 * var(--u));
+}
+
+.unites, .dizaines {
+  width: calc(50% - calc(1 * var(--u)));
+}
+
+.unites {
+  right: 0;
+}
+
+.dizaines {
+  left: 0;
+}
+
+.hours:before {
+  top: 50%;
+  right: calc(-1.3 * var(--u));
+  display: block;
+  margin-top: calc(-2 * var(--u));
+  width: calc(0.8 * var(--u));
+  height: calc(4 * var(--u));
+  background: #6e4875;
+  content: "";
+}
+
+.number {
+  width: 100%;
+  height: calc(16.5 * var(--u));
+  color: #fdb800;
+  font-size: calc(12 * var(--u));
+  line-height: calc(16 * var(--u));
+}
+.number.is-active {
+  animation: zIndexUp 0.5s forwards;
+}
+.number.outgoing {
+  animation: zIndexDown 0.5s forwards;
+}
+
+
+
+
+@keyframes zIndexUp {
+  0% {
+    z-index: 1;
+  }
+  100% {
+    z-index: 2;
+  }
+}
+
+
+
+@keyframes zIndexDown {
+  0% {
+    z-index: 2;
+  }
+  100% {
+    z-index: 1;
+  }
+}
+.up,
+.down {
+  width: 100%;
+  height: calc(50% - 1px);
+  overflow: hidden;
+  background: #472c4b;
+  border-radius: calc(0.7 * var(--u));
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  transition: none;
+}
+.up:before,
+.down:before {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  content: "";
+  transition: opactiy 0.25s;
+}
+
+.up {
+  top: 0;
+  transform-origin: bottom center;
+}
+.up:before {
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent);
+}
+.up .digit {
+  line-height: calc(16.8 * var(--u));
+}
+
+.down {
+  bottom: 0;
+  transform: perspective(calc(100 * var(--u))) rotateX(180deg);
+  transform-origin: top center;
+}
+.down:before {
+  top: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent);
+}
+.down .digit {
+  bottom: 0;
+  line-height: calc(16.2 * var(--u));
+}
+
+.digit {
+  width: 100%;
+}
+
+.is-active .up:before,
+.is-active .down:before {
+  opacity: 0;
+}
+.is-active .down {
+  transform: perspective(calc(100 * var(--u))) rotateX(0deg);
+  transition: transform 0.5s;
+}
+
+.outgoing .up {
+  transform: perspective(calc(100 * var(--u))) rotateX(-180deg);
+  transition: transform 0.5s;
+}
+.outgoing .down {
+  transform: perspective(calc(100 * var(--u))) rotateX(0deg);
+  transition: transform 0.5s;
+}
+
+.knob {
+  top: 50%;
+  right: calc(-4 * var(--u));
+  width: calc(3 * var(--u));
+  height: calc(15 * var(--u));
+  background: #eeead1;
+  border-radius: 0 calc(1 * var(--u)) calc(1 * var(--u)) 0;
+  transform: translateY(-50%);
+}
+
+.knob-lines {
+  top: 50%;
+  right: calc(-3 * var(--u));
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  transform: translateY(-50%);
+}
+
+.knob-line {
+  margin: calc(0.75 * var(--u)) 0;
+  width: calc(2.6 * var(--u));
+  height: calc(0.25 * var(--u));
+  background: #472c4b;
+}

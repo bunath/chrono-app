@@ -4,10 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chrono</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Inter:wght@400;600;700&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@600;700&family=Exo+2:wght@700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
+<script type="module" src="version.js"></script>
 <style>
 :root {
   --primary:#2563eb; --secondary:#7c3aed; --accent:#f97316;
@@ -557,6 +556,49 @@ body.light .clock-face{box-shadow:inset 0 2px 6px rgba(255,255,255,0.9),inset 0 
   inset:40%;background:#fff;border-radius:50%;opacity:0.6;
 }
 
+/* ══ HORLOGE — styles interchangeables (modèles CodePen, licence MIT) ═══ */
+.clock-style-row{display:flex;align-items:center;justify-content:center;gap:0.45rem;flex-wrap:wrap;}
+.clock-style-row label{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--soft);}
+.clock-style-row .tz-sel{max-width:min(320px,56vw);}
+.cs-btn{
+  width:30px;height:30px;border-radius:8px;border:1px solid rgba(148,163,184,0.35);
+  background:rgba(15,23,42,0.6);color:#e5e7eb;cursor:pointer;font-size:0.72rem;
+  display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;
+}
+body.light .cs-btn{background:#f1f5f9;color:#0f172a;}
+.cs-btn:hover{background:rgba(37,99,235,0.28);border-color:rgba(59,130,246,0.6);}
+.clock-pen{
+  position:relative;width:100%;aspect-ratio:16/10;border-radius:14px;overflow:hidden;
+  background:#000;box-shadow:0 10px 34px rgba(0,0,0,0.45);
+}
+.clock-pen iframe{
+  position:absolute;inset:0;width:100%;height:100%;border:0;
+  pointer-events:none;           /* les horloges ne sont pas interactives : le clavier (Échap, F11) reste à l'app */
+  opacity:0;transition:opacity 0.3s;
+}
+.clock-pen iframe.ready{opacity:1;}
+.clock-credit{font-size:0.66rem;color:var(--soft);text-align:center;opacity:0.85;}
+/* style "classique" : on garde l'horloge d'origine, on cache la zone du cadre */
+.tool-wrap:not(.pen-mode) .clock-pen,.tool-wrap:not(.pen-mode) .clock-credit{display:none;}
+/* style "modèle" : on cache chiffres + cadran classiques ; le cadre, la date et le crédit passent dessous */
+.tool-wrap.pen-mode .dig-clock,.tool-wrap.pen-mode .clock-svg-wrap{display:none;}
+.tool-wrap.pen-mode .clock-pen{order:1;}
+.tool-wrap.pen-mode .clock-date{order:2;}
+.tool-wrap.pen-mode .clock-credit{order:3;}
+/* plein écran : l'horloge prend tout l'écran, la date reste affichée en bas, aucun réglage */
+.tool-wrap.fs .clock-style-row,.tool-wrap.fs .clock-credit{display:none;}
+.tool-wrap.fs.pen-mode .clock-wrap{position:absolute;inset:0;width:100%;gap:0;}
+.tool-wrap.fs.pen-mode .clock-pen{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;border-radius:0;box-shadow:none;}
+.tool-wrap.fs.pen-mode .clock-date{
+  position:absolute;left:0;right:0;bottom:3.5vh;z-index:2;display:block;
+  color:var(--pen-fg,#fff);font-size:clamp(0.95rem,2.4vh,1.7rem);font-weight:600;letter-spacing:0.06em;
+  text-shadow:0 1px 10px rgba(0,0,0,0.35);opacity:0.9;
+}
+.credit-list{list-style:none;display:flex;flex-direction:column;gap:0.35rem;margin:0.2rem 0 0.5rem;}
+.credit-list li{font-size:0.72rem;line-height:1.35;color:var(--soft);}
+.credit-list b{color:var(--text);font-weight:600;}
+.credit-list span{display:block;font-size:0.64rem;opacity:0.75;word-break:break-all;}
+
 /* ══ SETTINGS PANEL ══════════════════════════════════════════ */
 .settings-panel{
   position:fixed;top:0;right:-420px;width:420px;height:100%;
@@ -807,9 +849,15 @@ body.light .font-sel{background:#f0f4f8;color:#0f172a;}
             <label><i class="fas fa-globe"></i> Fuseau :</label>
             <select class="tz-sel" id="tz-sel"></select>
           </div>
+          <div class="clock-style-row" id="clock-style-row">
+            <label><i class="fas fa-palette"></i> Style :</label>
+            <button class="cs-btn" id="cs-prev" type="button" title="Style précédent"><i class="fas fa-chevron-left"></i></button>
+            <select class="tz-sel" id="clock-style-sel" title="Choisir le style d'horloge"></select>
+            <button class="cs-btn" id="cs-next" type="button" title="Style suivant"><i class="fas fa-chevron-right"></i></button>
+          </div>
           <div class="dig-clock" id="dig-clock">00:00:00</div>
           <div class="clock-date" id="clock-date">—</div>
-          <!-- Horloge CSS div — modèle Pratyush Sudhakar adapté -->
+          <!-- Horloge classique de Chrono -->
           <div class="clock-svg-wrap">
             <div class="clock-face-wrap" id="the-clock">
               <div class="clock-face">
@@ -820,7 +868,11 @@ body.light .font-sel{background:#f0f4f8;color:#0f172a;}
                 <div id="clock-ticks-wrap"></div>
               </div>
             </div>
-          </div>        </div>
+          </div>
+          <!-- Styles "modèle" : chacun est une page autonome dans clocks/<id>/ (hors connexion) -->
+          <div class="clock-pen" id="clock-pen"><iframe id="clock-frame" title="Horloge" tabindex="-1"></iframe></div>
+          <div class="clock-credit" id="clock-credit"></div>
+        </div>
       </div>
     </section>
   </main>
@@ -935,19 +987,24 @@ body.light .font-sel{background:#f0f4f8;color:#0f172a;}
     </div>
     <div class="update-info" id="update-info">Cliquez sur Vérifier.</div>
   </div>
+  <div class="s-section">
+    <h3 class="s-section-title"><i class="fas fa-heart"></i> Crédits des horloges</h3>
+    <ul class="credit-list" id="credit-list"></ul>
+    <p class="dual-info">Modèles issus de CodePen, adaptés pour fonctionner hors connexion. Licence MIT (textes complets dans le dossier clocks/).</p>
+  </div>
 </aside>
 
 <script>
-// ══ TAURI / ELECTRON COMPAT SHIM ═════════════════════════════
+// ══ TAURI BRIDGE ═════════════════════════════
 // Tauri 2 injecte window.__TAURI__ quand withGlobalTauri:true
 const _tauri = window.__TAURI__;
 const invoke = _tauri ? (...a) => _tauri.core.invoke(...a) : null;
 const _listen = _tauri ? (...a) => _tauri.event.listen(...a) : () => {};
 const convertFileSrc = _tauri ? _tauri.core.convertFileSrc : (p) => 'file://' + p;
 
-// Interface identique à l'ancienne version Electron
-if (invoke && !window.electronAPI) {
-  window.electronAPI = {
+// Pont JavaScript vers les commandes natives Tauri
+if (invoke && !window.chronoAPI) {
+  window.chronoAPI = {
     toggleFullscreen:    ()           => invoke('toggle_fullscreen'),
     getDisplays:         ()           => invoke('get_displays'),
     moveToSecondScreen:  ()           => invoke('move_to_second_screen'),
@@ -959,6 +1016,7 @@ if (invoke && !window.electronAPI) {
     dbSetSetting:        (key, val)   => invoke('db_set_setting', { key, val }),
     pickMusicFile:       ()           => invoke('pick_music_file'),
     getVersion:          ()           => invoke('get_app_version'),
+    getPlatform:         ()           => invoke('get_app_platform'),
     checkForUpdates:     ()           => checkUpdatesGitHub(),
     onAppEvent:          (cb)         => _listen('app-event', e => cb(e.payload)),
   };
@@ -971,11 +1029,16 @@ function createLocalAudio(path) {
 
 // Version courante
 async function getCurrentVersion() {
-  if (window.electronAPI?.getVersion) return await window.electronAPI.getVersion();
+  if (window.chronoAPI?.getVersion) return await window.chronoAPI.getVersion();
   return '1.5.0';
 }
 
-// Vérifie GitHub directement (pas electron-updater)
+async function getCurrentPlatform() {
+  if (window.chronoAPI?.getPlatform) return await window.chronoAPI.getPlatform();
+  return 'browser';
+}
+
+// Vérifie GitHub directement (pas ancien système de mise à jour)
 async function checkUpdatesGitHub() {
   const resp = await fetch('https://api.github.com/repos/nathbu92/chronoapp/releases/latest');
   if (!resp.ok) throw new Error('HTTP ' + resp.status);
@@ -985,8 +1048,8 @@ async function checkUpdatesGitHub() {
 // ══ HELPERS ══════════════════════════════════════════════════
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
 function load(k,d){try{const v=localStorage.getItem(k);return v!=null?JSON.parse(v):d;}catch{return d;}}
-async function dbGet(k){return window.electronAPI?await window.electronAPI.dbGetSetting(k):load('s:'+k,null);}
-async function dbSet(k,v){if(window.electronAPI)await window.electronAPI.dbSetSetting(k,v);else save('s:'+k,v);}
+async function dbGet(k){return window.chronoAPI?await window.chronoAPI.dbGetSetting(k):load('s:'+k,null);}
+async function dbSet(k,v){if(window.chronoAPI)await window.chronoAPI.dbSetSetting(k,v);else save('s:'+k,v);}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 // ══ INIT ═════════════════════════════════════════════════════
@@ -1000,11 +1063,12 @@ document.addEventListener('DOMContentLoaded', async()=>{
   initStopwatch();
   await initTimer();
   initClock();
+  await initClockStyles();
   initDual();
   initUpdates();
-  // Écouter les événements Electron (menu natif + updater)
-  if(window.electronAPI){
-    window.electronAPI.onAppEvent(data=>{
+  // Écouter les événements natifs (menu + mise à jour)
+  if(window.chronoAPI){
+    window.chronoAPI.onAppEvent(data=>{
       if(data.type==='navigate') goTo(data.page);
       else if(data.type==='open-settings') openSettings();
       else if(data.type==='check-update') checkUpdates();
@@ -1060,8 +1124,8 @@ function initMenubar(){
 
   // Double écran header
   document.getElementById('mb-dual').addEventListener('click',async()=>{
-    if(!window.electronAPI) return;
-    const res=await window.electronAPI.moveToSecondScreen();
+    if(!window.chronoAPI) return;
+    const res=await window.chronoAPI.moveToSecondScreen();
     if(!res.ok) alert('Aucun écran secondaire détecté.');
     else document.getElementById('mb-dual').classList.add('active');
   });
@@ -1069,12 +1133,12 @@ function initMenubar(){
   // MAJ via menu aide
   document.getElementById('dd-update').addEventListener('click',checkUpdates);
   document.getElementById('dd-about').addEventListener('click',()=>
-    alert('Chrono\nChronomètre · Minuteur · Horloge\nConstruit avec Electron.'));
+    alert('Chrono\nChronomètre · Minuteur · Horloge\nConstruit avec Tauri.'));
 }
 
 async function toggleFsOS(){
-  if(window.electronAPI){
-    const r=await window.electronAPI.toggleFullscreen();
+  if(window.chronoAPI){
+    const r=await window.chronoAPI.toggleFullscreen();
     syncFsBtn(r&&r.fullscreen);
   } else {
     if(!document.fullscreenElement) document.documentElement.requestFullscreen();
@@ -1137,6 +1201,86 @@ async function initFont(){
   }
 }
 
+// ══ HORLOGE — styles interchangeables ═══════════════════════
+// Chaque style (hors "classique") est une page autonome dans clocks/<id>/, affichée dans un cadre isolé.
+// Modèles CodePen, licence MIT — auteurs et liens ci-dessous (et textes complets dans clocks/<id>/LICENSE.txt).
+const CLOCK_STYLES=[
+  {id:'classic',   name:'Classique (Chrono)'},
+  {id:'neumorphic',name:'Neumorphic Clock',        author:'Burmese Potato',      pen:'BurmesePotato/pen/LYyOVoe', bg:'#9C2D41'},
+  {id:'wall',      name:'Wall clock',              author:'Felix De Montis',     pen:'dervondenbergen/pen/dVPOwB',bg:'#000000'},
+  {id:'flip',      name:'Flip Clock',              author:'Chris Sev',           pen:'chris__sev/pen/VwmXZyw',    bg:'#4f46e5'},
+  {id:'neon-pink', name:'Clock digital (néon rose)',author:'Metty',              pen:'Metty/pen/poYwNjv',         bg:'#9b5b92'},
+  {id:'blocky',    name:'Blocky Digital Clock',    author:'Jon Kantner',         pen:'jkantner/pen/KQaZdp',       bg:'#000000'},
+  {id:'dail',      name:'Dail',                    author:'Vineeth.TR',          pen:'vineethtrv/pen/abjrWyW',    bg:'#000000'},
+  {id:'atc-flip',  name:'ATC Vintage Flip Clock',  author:'Tiffany Stoik',       pen:'tstoik/pen/gaawRR',         bg:'#6fd1b5', dark:true},
+  {id:'vue',       name:'Digital Clock',           author:'Toshiyuki TAKAHASHI', pen:'gau/pen/LjQwGp',            bg:'#000000'},
+  {id:'slide',     name:'Slide Clock',             author:'Alca',                pen:'Alca/pen/BZbPrE',           bg:'#0e141b'},
+  {id:'neon-blue', name:'Neon Clock (CSS)',        author:'wheatup',             pen:'wheatup/pen/JjzdMbK',       bg:'#000000'},
+];
+let clockStyleId='classic';
+const clockStyle=()=>CLOCK_STYLES.find(s=>s.id===clockStyleId)||CLOCK_STYLES[0];
+const clockTz=()=>document.getElementById('tz-sel').value||'local';
+
+function loadClockFrame(){
+  const fr=document.getElementById('clock-frame');
+  const st=clockStyle();
+  if(st.id==='classic'){unloadClockFrame();return;}
+  fr.classList.remove('ready');
+  fr.onload=()=>fr.classList.add('ready');
+  fr.src='clocks/'+st.id+'/index.html?tz='+encodeURIComponent(clockTz());
+}
+function unloadClockFrame(){            // on décharge le cadre hors de la page Horloge : plus aucune animation en tâche de fond
+  const fr=document.getElementById('clock-frame');
+  fr.onload=null;fr.classList.remove('ready');
+  if(fr.getAttribute('src')!=='about:blank') fr.src='about:blank';
+}
+function applyClockStyle(){
+  const box=document.getElementById('cl-box');
+  const st=clockStyle(), pen=st.id!=='classic';
+  box.classList.toggle('pen-mode',pen);
+  box.style.setProperty('--pen-fg',st.dark?'#1f2937':'#ffffff');
+  document.getElementById('clock-pen').style.background=st.bg||'#000';
+  document.getElementById('clock-credit').textContent=pen?`« ${st.name} » par ${st.author} — CodePen, licence MIT`:'';
+  if(document.getElementById('clock').classList.contains('active')) loadClockFrame(); else unloadClockFrame();
+}
+async function setClockStyle(id){
+  clockStyleId=id;
+  document.getElementById('clock-style-sel').value=id;
+  await dbSet('clock-style',id);
+  applyClockStyle();
+}
+function stepClockStyle(d){
+  const i=CLOCK_STYLES.findIndex(s=>s.id===clockStyleId);
+  setClockStyle(CLOCK_STYLES[(i+d+CLOCK_STYLES.length)%CLOCK_STYLES.length].id);
+}
+async function initClockStyles(){
+  const sel=document.getElementById('clock-style-sel');
+  CLOCK_STYLES.forEach(s=>{
+    const o=document.createElement('option');o.value=s.id;
+    o.textContent=s.author?`${s.name} — ${s.author}`:s.name;
+    sel.appendChild(o);
+  });
+  const saved=await dbGet('clock-style');
+  clockStyleId=CLOCK_STYLES.some(s=>s.id===saved)?saved:'classic';
+  sel.value=clockStyleId;
+  sel.addEventListener('change',()=>setClockStyle(sel.value));
+  document.getElementById('cs-prev').addEventListener('click',()=>stepClockStyle(-1));
+  document.getElementById('cs-next').addEventListener('click',()=>stepClockStyle(1));
+  // le changement de fuseau est transmis au cadre sans le recharger
+  document.getElementById('tz-sel').addEventListener('change',()=>{
+    const fr=document.getElementById('clock-frame');
+    try{fr.contentWindow.postMessage({type:'chrono-tz',tz:clockTz()},'*');}catch(_){}
+  });
+  // crédits (Paramètres)
+  const ul=document.getElementById('credit-list');
+  CLOCK_STYLES.filter(s=>s.author).forEach(s=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<b>${esc(s.name)}</b> — ${esc(s.author)}<span>codepen.io/${esc(s.pen)}</span>`;
+    ul.appendChild(li);
+  });
+  applyClockStyle();
+}
+
 // ══ NAVIGATION ═══════════════════════════════════════════════
 function initNav(){
   document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>goTo(b.dataset.page)));
@@ -1145,6 +1289,7 @@ function initNav(){
 function goTo(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===name));
   document.querySelectorAll('.mb-nav-btn[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===name));
+  if(typeof loadClockFrame==='function'){ if(name==='clock') loadClockFrame(); else unloadClockFrame(); }
 }
 
 // ══ PARAMÈTRES ════════════════════════════════════════════════
@@ -1184,10 +1329,10 @@ function toggleBox(box,btn){
   btn.querySelector('i').className=entering?'fas fa-compress':'fas fa-expand';
   // Plein écran OS synchronisé
   if(entering){
-    if(window.electronAPI) window.electronAPI.toggleFullscreen();
+    if(window.chronoAPI) window.chronoAPI.toggleFullscreen();
     else if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
   } else {
-    if(window.electronAPI) window.electronAPI.toggleFullscreen();
+    if(window.chronoAPI) window.chronoAPI.toggleFullscreen();
     else if(document.fullscreenElement) document.exitFullscreen();
   }
   syncFsBtn(entering);
@@ -1328,8 +1473,8 @@ async function initTimer(){
   }
 
   document.getElementById('pick-music').addEventListener('click',async()=>{
-    if(!window.electronAPI) return alert('Disponible dans l\'app uniquement.');
-    const p=await window.electronAPI.pickMusicFile();
+    if(!window.chronoAPI) return alert('Disponible dans l\'app uniquement.');
+    const p=await window.chronoAPI.pickMusicFile();
     if(p){
       localPath=p;
       document.getElementById('music-name').textContent=p.split(/[\\/]/).pop();
@@ -1414,7 +1559,7 @@ async function initTimer(){
 
   async function renderPresets(){
     listEl.innerHTML='';
-    let ps=window.electronAPI?await window.electronAPI.dbGetPresets():load('tp',[]);
+    let ps=window.chronoAPI?await window.chronoAPI.dbGetPresets():load('tp',[]);
     if(!ps.length){listEl.innerHTML='<span style="font-size:0.7rem;color:var(--soft)">Aucun préréglage.</span>';return;}
     ps.forEach(p=>{
       const ph=Math.floor(p.secs/3600),pm=Math.floor((p.secs%3600)/60),ps2=p.secs%60;
@@ -1422,7 +1567,7 @@ async function initTimer(){
       chip.innerHTML=`<i class="fas fa-hourglass-half"></i>${esc(p.name)} <span style="opacity:0.5;font-size:0.68rem">${[ph,pm,ps2].map(v=>v.toString().padStart(2,'0')).join(':')}</span><span class="del">✕</span>`;
       chip.addEventListener('click',async e=>{
         if(e.target.classList.contains('del')){
-          if(window.electronAPI) await window.electronAPI.dbDeletePreset(p.id);
+          if(window.chronoAPI) await window.chronoAPI.dbDeletePreset(p.id);
           else{const a=load('tp',[]);const i=a.findIndex(x=>x.id===p.id);if(i>=0){a.splice(i,1);save('tp',a);}}
           renderPresets();
         } else {
@@ -1440,7 +1585,7 @@ async function initTimer(){
   saveBtn.addEventListener('click',async()=>{
     const name=nameIn.value.trim();if(!name){nameIn.focus();return;}
     const secs=Math.floor(msFromInputs()/1000);if(!secs) return;
-    if(window.electronAPI) await window.electronAPI.dbSavePreset(name,secs);
+    if(window.chronoAPI) await window.chronoAPI.dbSavePreset(name,secs);
     else{const a=load('tp',[]);a.push({id:Date.now(),name,secs});save('tp',a);}
     nameIn.value='';renderPresets();
   });
@@ -1530,22 +1675,22 @@ function initClock(){
 // ══ DOUBLE ÉCRAN ═════════════════════════════════════════════
 function initDual(){
   document.getElementById('btn-2nd').addEventListener('click',async()=>{
-    if(!window.electronAPI) return;
-    const r=await window.electronAPI.moveToSecondScreen();
+    if(!window.chronoAPI) return;
+    const r=await window.chronoAPI.moveToSecondScreen();
     if(!r.ok) alert('Aucun écran secondaire.');
     else document.getElementById('mb-dual').classList.add('active');
     document.getElementById('settings-panel').classList.remove('open');
   });
   document.getElementById('btn-1st').addEventListener('click',async()=>{
-    if(!window.electronAPI) return;
-    await window.electronAPI.restorePrimary();
+    if(!window.chronoAPI) return;
+    await window.chronoAPI.restorePrimary();
     document.getElementById('mb-dual').classList.remove('active');
   });
 }
 async function refreshDual(){
   const el=document.getElementById('dual-info');
-  if(!window.electronAPI){el.textContent='Mode navigateur.';return;}
-  const ds=await window.electronAPI.getDisplays();
+  if(!window.chronoAPI){el.textContent='Mode navigateur.';return;}
+  const ds=await window.chronoAPI.getDisplays();
   if(ds.length<2){el.className='dual-info warn';el.textContent='⚠ Un seul écran détecté.';}
   else{el.className='dual-info ok';el.textContent=`✓ ${ds.length} écrans : ${ds.map(d=>d.label).join(' · ')}`;}
 }
@@ -1560,35 +1705,14 @@ const umBar=document.getElementById('um-bar');
 const umDlBtn=document.getElementById('um-dl-btn');
 const umLaterBtn=document.getElementById('um-later-btn');
 
-function showUpdateModal(mode,data){
-  updateModal.style.display='flex';
-  if(mode==='available'){
-    umTitle.textContent=`Version ${data.version} disponible !`;
-    umSubtitle.textContent='Une nouvelle version de Chrono est prête à être téléchargée.';
-    umProgressWrap.style.display='none';
-    umDlBtn.innerHTML='<i class="fas fa-download"></i> Télécharger et installer';
-    umDlBtn.disabled=false;umDlBtn.style.opacity='1';
-    umDlBtn.onclick=()=>{
-      umDlBtn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Téléchargement…';
-      umDlBtn.disabled=true;umDlBtn.style.opacity='0.7';
-      umProgressWrap.style.display='block';
-      window.electronAPI?.checkForUpdates();
-    };
-  } else if(mode==='ready'){
-    umTitle.textContent='Mise à jour prête !';
-    umSubtitle.textContent='Le téléchargement est terminé. Redémarrez pour installer.';
-    umProgressWrap.style.display='none';
-    umDlBtn.innerHTML='<i class="fas fa-redo"></i> Redémarrer et installer';
-    umDlBtn.disabled=false;umDlBtn.style.opacity='1';
-    umDlBtn.onclick=()=>window.electronAPI?.installUpdate();
-  }
-  umLaterBtn.onclick=()=>{ updateModal.style.display='none'; };
-}
-
 function initUpdates(){
   document.getElementById('btn-check-update').addEventListener('click',checkUpdates);
   // Vérification auto au démarrage après 5s
   setTimeout(async()=>{
+    if(await getCurrentPlatform() !== 'windows'){
+      document.getElementById('update-info').textContent='Téléchargez les mises à jour de cette plateforme depuis GitHub Releases.';
+      return;
+    }
     try{
       const resp=await fetch('https://api.github.com/repos/nathbu92/chronoapp/releases/latest');
       if(!resp.ok) return;
@@ -1599,12 +1723,17 @@ function initUpdates(){
       const exeAsset=assets.find(a=>a.name&&a.name.toLowerCase().includes('setup')&&a.name.endsWith('.exe'))
                     ||assets.find(a=>a.name&&a.name.endsWith('.exe'));
       const exeUrl=exeAsset?exeAsset.browser_download_url:'';
-      if(isNewerVersion(currentV,latestV)) openUpdateModal(latestV,exeUrl,data.body||'');
+      if(window.isNewerVersion(currentV,latestV)) openUpdateModal(latestV,exeUrl,data.body||'');
     }catch(_){}
   },5000);
 }
 async function checkUpdates(){
   const el=document.getElementById('update-info');
+  if(await getCurrentPlatform() !== 'windows'){
+    el.className='update-info';
+    el.textContent='Pour cette plateforme, téléchargez la dernière version depuis GitHub Releases.';
+    return;
+  }
   el.className='update-info';el.textContent='Recherche…';
   try{
     const resp=await fetch('https://api.github.com/repos/nathbu92/chronoapp/releases/latest');
@@ -1616,18 +1745,13 @@ async function checkUpdates(){
     const exeAsset=assets.find(a=>a.name&&a.name.toLowerCase().includes('setup')&&a.name.endsWith('.exe'))
                   ||assets.find(a=>a.name&&a.name.endsWith('.exe'));
     const exeUrl=exeAsset?exeAsset.browser_download_url:'';
-    if(isNewerVersion(currentV,latestV)){
+    if(window.isNewerVersion(currentV,latestV)){
       el.className='update-info warn';el.textContent=`⬆ v${latestV} disponible.`;
       openUpdateModal(latestV,exeUrl,data.body||'');
     } else {
       el.className='update-info ok';el.textContent='✓ Vous avez la dernière version (v'+currentV+').';
     }
   }catch(e){el.className='update-info err';el.textContent='Erreur : '+e.message;}
-}
-function isNewerVersion(current,latest){
-  const p=v=>v.replace(/^v/,'').split('.').map(n=>parseInt(n)||0);
-  const[cM,cm,cp]=p(current),[lM,lm,lp]=p(latest);
-  if(lM!==cM)return lM>cM;if(lm!==cm)return lm>cm;return lp>cp;
 }
 function openUpdateModal(version,exeUrl,body){
   const m=document.getElementById('update-modal');

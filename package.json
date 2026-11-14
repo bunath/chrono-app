@@ -1,13 +1,28 @@
 {
-  "name": "chrono-tauri",
+  "name": "chrono",
   "version": "1.5.0",
-  "description": "Chrono — Chronomètre, minuteur, horloge",
+  "private": true,
+  "description": "Chrono — Chronomètre, minuteur et horloge",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@10.20.0",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "tauri": "tauri",
     "dev": "tauri dev",
-    "build": "tauri build"
+    "build": "tauri build",
+    "lint": "node scripts/lint-inline.mjs",
+    "format": "prettier --write package.json README.md .github/workflows/*.yml scripts/*.mjs eslint.config.js tests/*.mjs src-tauri/tauri.conf.json src-tauri/capabilities/*.json",
+    "format:check": "prettier --check package.json README.md .github/workflows/*.yml scripts/*.mjs eslint.config.js tests/*.mjs src-tauri/tauri.conf.json src-tauri/capabilities/*.json",
+    "typecheck": "node scripts/check-inline-scripts.mjs",
+    "test": "node --test tests/*.test.mjs"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2"
+    "@tauri-apps/cli": "^2.12.3",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
+    "prettier": "^3.6.2"
   }
 }

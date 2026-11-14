@@ -1,75 +1,102 @@
-# Chrono — Application Tauri
+# Chrono
 
-Chronomètre · Minuteur · Horloge — migré de Electron vers **Tauri 2**
+Application de bureau **Tauri 2** : chronomètre, minuteur et horloge.
 
-## Avantages de Tauri vs Electron
-| | Electron | Tauri |
-|---|---|---|
-| Taille bundle | ~80 Mo | ~5 Mo |
-| RAM au démarrage | ~120 Mo | ~30 Mo |
-| Moteur | Chromium embarqué | WebView2 natif Windows |
-| Backend | Node.js | Rust |
+## Environnement de développement
 
-## Prérequis développement
+### Prérequis
 
-### Windows
+- Node.js 22 ou plus récent
+- pnpm 10 (via Corepack)
+- Rust stable installé avec rustup
+- Les dépendances natives Tauri de votre système
+- Sous Windows : WebView2 et Visual Studio Build Tools (C++). WebView2 est déjà présent sur Windows 10/11 dans la plupart des installations.
+
+### Installer et lancer
+
 ```bash
-# 1. Rust
-https://rustup.rs
-
-# 2. WebView2 (déjà installé sur Windows 10/11)
-
-# 3. Node.js 20+
-https://nodejs.org
-
-# 4. Visual Studio Build Tools (C++)
-https://visualstudio.microsoft.com/visual-cpp-build-tools/
+corepack enable pnpm
+pnpm install
+pnpm tauri dev
 ```
 
-## Lancer en développement
+`pnpm tauri dev` démarre le petit serveur statique local puis ouvre Chrono dans la WebView Tauri. Les ressources de `src/` sont servies sans bundler afin de conserver les horloges, polices et fichiers HTML existants.
+
+### Vérifications qualité
+
 ```bash
-npm install
-npm run dev
+pnpm lint
+pnpm format:check
+pnpm typecheck
+pnpm test
 ```
 
-## Builder
+Le frontend est en JavaScript natif (pas en TypeScript) : `pnpm typecheck` vérifie donc la syntaxe de tous les scripts et pages intégrés, tandis que `pnpm lint` applique ESLint.
+
+Pour vérifier le backend Rust :
+
 ```bash
-npm run build
-# → src-tauri/target/release/bundle/nsis/Chrono_1.5.0_x64-setup.exe
+cargo fmt --manifest-path src-tauri/Cargo.toml --all -- --check
+cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
+cargo test --manifest-path src-tauri/Cargo.toml
 ```
 
-## Publier une MAJ
+### Compiler localement
+
 ```bash
-git tag v1.5.0
-git push origin v1.5.0
-# GitHub Actions build et publie automatiquement
+pnpm tauri build
 ```
+
+Les installeurs sont générés dans `src-tauri/target/release/bundle/` : NSIS/MSI sous Windows, DMG sous macOS, DEB/RPM/AppImage sous Linux (selon les outils installés sur la machine).
+
+Pour compiler l'application sans générer d'installeur :
+
+```bash
+pnpm tauri build --no-bundle
+```
+
+## Releases automatiques
+
+La CI vérifie le JavaScript intégré, le formatage, les tests et le backend Rust sur les pull requests et les branches principales. Sur les pushes vers la branche principale, elle compile aussi Tauri sans générer les installeurs, sous Windows, macOS et Linux.
+
+Pour publier une version :
+
+```bash
+# Mettre à jour CHANGELOG.md et les versions package.json / tauri.conf.json / Cargo.toml
+# Puis créer et pousser le tag correspondant :
+git tag v1.5.1
+git push origin v1.5.1
+```
+
+GitHub Actions compile automatiquement Windows, macOS et Linux, rassemble les installeurs et publie une GitHub Release avec les notes générées automatiquement. Un lancement manuel du workflow `Build & Release` compile et conserve les artefacts sans publier de release.
+
+Aucune annonce Discord n'est envoyée.
 
 ## Structure
+
+```text
+chrono/
+├── .github/workflows/
+│   ├── ci.yml                 # Qualité frontend + Rust
+│   └── release.yml            # Builds multiplateformes + GitHub Releases
+├── scripts/
+│   ├── dev-server.mjs         # Serveur statique utilisé par Tauri en dev
+│   ├── lint-inline.mjs        # ESLint sur les scripts des pages HTML
+│   ├── check-inline-scripts.mjs
+│   └── set-version.mjs        # Synchronisation de version au moment d'une release
+├── src/                       # Interface HTML/CSS/JS et ressources
+└── src-tauri/                 # Application native et commandes Rust
+    ├── capabilities/
+    ├── icons/
+    ├── src/
+    ├── Cargo.toml
+    └── tauri.conf.json
 ```
-chrono-tauri/
-├── src/                    # Frontend HTML/CSS/JS (inchangé vs Electron)
-│   ├── index.html          # Application principale
-│   ├── update.html         # Fenêtre de mise à jour
-│   └── assets/             # Icônes, images
-├── src-tauri/              # Backend Rust
-│   ├── src/
-│   │   ├── main.rs         # Point d'entrée
-│   │   └── lib.rs          # Commandes Tauri (DB, MAJ, écrans…)
-│   ├── Cargo.toml
-│   └── tauri.conf.json
-└── .github/workflows/
-    └── build.yml           # CI/CD automatique
-```
 
-## Différences avec la version Electron
+## Données locales
 
-Le frontend est **identique** — seul le pont IPC change :
-- Electron : `window.electronAPI.xxx()`
-- Tauri : `window.__TAURI__.core.invoke('xxx', args)`
+La base SQLite `chrono.db` est stockée dans le répertoire de données applicatif Tauri (`app_data_dir`). Les réglages et les préréglages de minuteur restent donc locaux à l'utilisateur.
 
-Un shim de compatibilité en haut de `index.html` maintient la même interface.
+## Mise à jour intégrée
 
-## Base de données SQLite
-Stockée dans `%AppData%\com.chrono.app\chrono.db`
-Tables : `timer_presets`, `settings`
+L'interface de mise à jour existante télécharge actuellement le programme d'installation Windows `.exe` depuis les GitHub Releases. Les versions macOS et Linux sont publiées automatiquement, mais leur mise à jour intégrée multiplateforme nécessitera ensuite la configuration du plugin updater Tauri et la signature des artefacts.
