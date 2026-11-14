@@ -143,7 +143,31 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: Chrono ${{ github.ref_name }}
+          body: |
+            # 🚀 Chrono ${{ github.ref_name }}
+
+            Merci d'utiliser Chrono !
+
+            ## 📦 Téléchargement
+
+            Retrouvez ci-dessous les installateurs correspondant à votre système d'exploitation.
+
+            | Système | Formats |
+            |---|---|
+            | Windows | `.exe` · `.msi` |
+            | macOS | `.dmg` |
+            | Linux | `.deb` · `.rpm` · `.AppImage` |
+
+            ## ✨ Nouveautés
+
+            Retrouvez les changements détaillés et les améliorations de cette version dans les notes ci-dessous.
+
+            ## ❤️ Merci
+
+            Merci à toutes les personnes qui utilisent Chrono et contribuent à son évolution.
+
           generate_release_notes: true
           draft: false
           prerelease: false
+          make_latest: true
           files: release-assets/**
