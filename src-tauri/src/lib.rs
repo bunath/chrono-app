@@ -1,11 +1,11 @@
-use once_cell::sync::OnceCell;
-use rusqlite::{Connection, params};
+﻿use once_cell::sync::OnceCell;
+use rusqlite::{params, Connection};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::sync::Mutex;
 use tauri::{AppHandle, Emitter, Manager};
 
-// ── Base de données ───────────────────────────────────────────
+// â”€â”€ Base de donnÃ©es â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 static DB: OnceCell<Mutex<Connection>> = OnceCell::new();
 
 fn init_db(app: &AppHandle) {
@@ -35,7 +35,7 @@ fn db() -> std::sync::MutexGuard<'static, Connection> {
     DB.get().expect("db not init").lock().unwrap()
 }
 
-// ── Types ─────────────────────────────────────────────────────
+// â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TimerPreset {
     pub id: i64,
@@ -43,12 +43,15 @@ pub struct TimerPreset {
     pub secs: i64,
 }
 
-// ── Commandes DB ──────────────────────────────────────────────
+// â”€â”€ Commandes DB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 #[tauri::command]
 fn db_get_setting(key: String) -> Option<String> {
-    db()
-        .query_row("SELECT value FROM settings WHERE key=?1", params![key], |r| r.get(0))
-        .ok()
+    db().query_row(
+        "SELECT value FROM settings WHERE key=?1",
+        params![key],
+        |r| r.get(0),
+    )
+    .ok()
 }
 
 #[tauri::command]
@@ -94,7 +97,7 @@ fn db_delete_preset(id: i64) {
     let _ = db().execute("DELETE FROM timer_presets WHERE id=?1", params![id]);
 }
 
-// ── Fichier musique ────────────────────────────────────────────
+// â”€â”€ Fichier musique â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 #[tauri::command]
 async fn pick_music_file(app: AppHandle) -> Option<String> {
     use tauri_plugin_dialog::DialogExt;
@@ -102,14 +105,17 @@ async fn pick_music_file(app: AppHandle) -> Option<String> {
     let (tx, rx) = std::sync::mpsc::channel();
     app.dialog()
         .file()
-        .add_filter("Audio", &["mp3", "wav", "ogg", "flac", "aac", "m4a", "opus", "wma"])
+        .add_filter(
+            "Audio",
+            &["mp3", "wav", "ogg", "flac", "aac", "m4a", "opus", "wma"],
+        )
         .pick_file(move |file| {
             let _ = tx.send(file);
         });
     rx.recv().ok()?.map(|path| path.to_string())
 }
 
-// ── Dossier Téléchargements (sans dépendance externe) ─────────
+// â”€â”€ Dossier TÃ©lÃ©chargements (sans dÃ©pendance externe) â”€â”€â”€â”€â”€â”€â”€â”€â”€
 fn downloads_dir() -> PathBuf {
     // Windows : USERPROFILE\Downloads, fallback HOME\Downloads, fallback .
     std::env::var("USERPROFILE")
@@ -118,11 +124,14 @@ fn downloads_dir() -> PathBuf {
         .unwrap_or_else(|_| PathBuf::from("."))
 }
 
-// ── Téléchargement MAJ ────────────────────────────────────────
+// â”€â”€ TÃ©lÃ©chargement MAJ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 static DOWNLOAD_PATH: OnceCell<Mutex<Option<PathBuf>>> = OnceCell::new();
 
 fn dl_path() -> std::sync::MutexGuard<'static, Option<PathBuf>> {
-    DOWNLOAD_PATH.get_or_init(|| Mutex::new(None)).lock().unwrap()
+    DOWNLOAD_PATH
+        .get_or_init(|| Mutex::new(None))
+        .lock()
+        .unwrap()
 }
 
 #[tauri::command]
@@ -151,11 +160,10 @@ async fn download_update(url: String, version: String, app: AppHandle) -> Result
             .await
             .map_err(|error| error.to_string())?;
         received += chunk.len() as u64;
-        let percent = if total > 0 {
-            received * 100 / total
-        } else {
-            0
-        };
+        let percent = received
+    .checked_mul(100)
+    .and_then(|value| value.checked_div(total))
+    .unwrap_or(0);
         let _ = app.emit(
             "update-progress",
             serde_json::json!({
@@ -205,17 +213,19 @@ fn get_app_platform() -> String {
     std::env::consts::OS.to_string()
 }
 
-// ── Helper : nom du moniteur en &str ─────────────────────────
+// â”€â”€ Helper : nom du moniteur en &str â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 fn monitor_name(monitor: &tauri::Monitor) -> &str {
     monitor.name().map(|name| name.as_str()).unwrap_or("")
 }
 
-// ── Écrans secondaires ────────────────────────────────────────
+// â”€â”€ Ã‰crans secondaires â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 #[tauri::command]
 fn get_displays(app: AppHandle) -> serde_json::Value {
     let monitors = app.available_monitors().unwrap_or_default();
     let primary = app.primary_monitor().ok().flatten();
-    let primary_name = primary.as_ref().map(|monitor| monitor_name(monitor).to_owned());
+    let primary_name = primary
+        .as_ref()
+        .map(|monitor| monitor_name(monitor).to_owned());
 
     let list: Vec<_> = monitors
         .iter()
@@ -227,7 +237,7 @@ fn get_displays(app: AppHandle) -> serde_json::Value {
                 "index": index,
                 "isPrimary": is_primary,
                 "label": format!(
-                    "Écran {}{}",
+                    "Ã‰cran {}{}",
                     index + 1,
                     if is_primary { " (principal)" } else { "" }
                 ),
@@ -248,7 +258,9 @@ fn get_displays(app: AppHandle) -> serde_json::Value {
 fn move_to_second_screen(app: AppHandle) -> serde_json::Value {
     let monitors = app.available_monitors().unwrap_or_default();
     let primary = app.primary_monitor().ok().flatten();
-    let primary_name = primary.as_ref().map(|monitor| monitor_name(monitor).to_owned());
+    let primary_name = primary
+        .as_ref()
+        .map(|monitor| monitor_name(monitor).to_owned());
 
     let secondary = monitors
         .iter()
@@ -280,7 +292,7 @@ fn restore_primary_screen(app: AppHandle) {
     }
 }
 
-// ── Journal de plantage (la version release n'a pas de console) ──
+// â”€â”€ Journal de plantage (la version release n'a pas de console) â”€â”€
 fn install_crash_logger() {
     std::panic::set_hook(Box::new(|info| {
         use std::io::Write;
@@ -301,7 +313,7 @@ fn install_crash_logger() {
     }));
 }
 
-// ── Plein écran (bouton + F11) ────────────────────────────────
+// â”€â”€ Plein Ã©cran (bouton + F11) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 #[tauri::command]
 fn toggle_fullscreen(app: AppHandle) -> serde_json::Value {
     if let Some(window) = app.get_webview_window("main") {
@@ -313,7 +325,7 @@ fn toggle_fullscreen(app: AppHandle) -> serde_json::Value {
     serde_json::json!({ "fullscreen": false })
 }
 
-// ── Setup ─────────────────────────────────────────────────────
+// â”€â”€ Setup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     install_crash_logger();
@@ -322,7 +334,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             init_db(app.handle());
-            // Force l'affichage et le focus de la fenêtre principale
+            // Force l'affichage et le focus de la fenÃªtre principale
             if let Some(window) = app.get_webview_window("main") {
                 window.show().unwrap_or_default();
                 window.set_focus().unwrap_or_default();
@@ -350,3 +362,4 @@ pub fn run() {
         .run(tauri::generate_context!())
         .expect("Erreur Tauri");
 }
+

@@ -1,4 +1,4 @@
-import globals from "globals";
+﻿import globals from "globals";
 
 export default [
   {
@@ -9,6 +9,10 @@ export default [
       globals: {
         ...globals.browser,
         ...globals.node,
+
+        // Fonctions globales Chrono
+        chronoNow: "readonly",
+        chronoFit: "readonly",
       },
     },
     rules: {

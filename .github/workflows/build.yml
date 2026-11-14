@@ -3,13 +3,13 @@ name: Build & Release Tauri
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version (optionnel)'
+        description: "Version (optionnel)"
         required: false
-        default: 'manuel'
+        default: "manuel"
 
 permissions:
   contents: write
@@ -25,7 +25,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
