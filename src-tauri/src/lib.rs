@@ -1,4 +1,4 @@
-﻿use once_cell::sync::OnceCell;
+use once_cell::sync::OnceCell;
 use rusqlite::{params, Connection};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -161,9 +161,9 @@ async fn download_update(url: String, version: String, app: AppHandle) -> Result
             .map_err(|error| error.to_string())?;
         received += chunk.len() as u64;
         let percent = received
-    .checked_mul(100)
-    .and_then(|value| value.checked_div(total))
-    .unwrap_or(0);
+            .checked_mul(100)
+            .and_then(|value| value.checked_div(total))
+            .unwrap_or(0);
         let _ = app.emit(
             "update-progress",
             serde_json::json!({
@@ -362,4 +362,3 @@ pub fn run() {
         .run(tauri::generate_context!())
         .expect("Erreur Tauri");
 }
-
